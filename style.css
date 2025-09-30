@@ -306,6 +306,7 @@ overflow: hidden;
     font-size: 1.2rem;
     line-height: 1.8;
     opacity: 0.9;
+    color: white;
 }
 
 /* Skills Section */
@@ -343,6 +344,7 @@ overflow: hidden;
     font-size: 1.3rem;
     font-weight: 600;
     margin-bottom: 1rem;
+    color: white;
 }
 
 .skill-progress {
@@ -408,6 +410,7 @@ overflow: hidden;
     opacity: 1.2;
     margin-bottom: 1.5rem;
     line-height: 1.6;
+    color: white;
 }
 
 .project-link {
@@ -482,9 +485,6 @@ overflow: hidden;
     min-height: 120px;
     resize: vertical;
 }
-.copyright {
-    color: white;
-}
 
 .submit-btn {
     width: 100%;
@@ -511,6 +511,11 @@ overflow: hidden;
     text-align: center;
     padding: 2rem;
     background: transparent;
+ 
+
+}
+.copyright {
+    color: white;
 
 }
 
@@ -782,5 +787,3 @@ overflow: hidden;
         grid-template-columns: 1fr;
     }
 }
-
-
