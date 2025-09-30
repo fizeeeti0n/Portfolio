@@ -214,6 +214,7 @@ transition: all 0.3s ease;
     margin-bottom: 2rem;
     opacity: 0.9;
     animation: fadeInUp 1s ease-out 0.3s both;
+    color: white;
 }
 
 .cta-button {
@@ -787,3 +788,4 @@ overflow: hidden;
         grid-template-columns: 1fr;
     }
 }
+
