@@ -515,9 +515,9 @@ overflow: hidden;
  
 
 }
+
 .copyright {
     color: white;
-
 }
 
 .social-links {
@@ -788,4 +788,5 @@ overflow: hidden;
         grid-template-columns: 1fr;
     }
 }
+
 
