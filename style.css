@@ -6,8 +6,8 @@
 
   body {
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
-    color: #ffffff;
+     background: #080808;
+    color: #080808;
     overflow-x: hidden;
     scroll-behavior: smooth;}
 
@@ -779,4 +779,5 @@ overflow: hidden;
     .skills-grid {
         grid-template-columns: 1fr;
     }
+
 }
