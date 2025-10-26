@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-site-verification" content="IlJIAQ0wrPutDWmf5n7ftrXvQNx6IbRRpfLDB4p6Vr4" />
+    <title>Ahanaf Shahriar Nafiz - Portfolio</title>
+     <link rel="icon" href="./photo/fav.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/emailjs-com/3.2.0/email.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <canvas id="global-canvas" style="
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+"></canvas>
+<div id="loader-wrapper">
+  <div id="loader">
+    <div class="spinner">
+      <img src="./photo/log.png" alt="logo">
+    </div>
+  </div>
+</div>
+
+  <div id="main-content" style="visibility: hidden;">
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+           <a href=" " class="nav-logo">
+    <img src="./photo/log.png" alt="logo" width="60" height="60">
+            
+</a>
+            <ul class="nav-menu" id="nav-menu">
+              
+                <li class="nav-item">
+                    <a href="#about" class="nav-link">About</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#skills" class="nav-link">Skills</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#projects" class="nav-link">Projects</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="#experience" class="nav-link">Experience</a>
+                </li>
+                
+                <li class="nav-item">
+                    <a href="#certificates" class="nav-link">Certificates</a> </li>
+                <li class="nav-item">
+
+                    <a href="#contact" class="nav-link">Contact</a>
+                </li>
+            </ul>
+            <button class="mobile-menu-toggle" id="mobile-toggle" aria-label="Toggle navigation menu">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </nav>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Ahanaf Shahriar Nafiz</h1>
+            <p class="tagline">Creative Developer | AI Enthusiast</p>
+          <a href="/cv/Ahanaf_Shahriar_Nafiz_Resume.pdf" class="cta-button"
+   target="_blank"
+   rel="noopener noreferrer">
+    Download Resume
+</a>
+        </div>
+    </section>
+
+    <section class="section fade-in" id="about">
+    <h2 class="section-title">About Me</h2>
+    <div class="about-container">
+  
+            <div class="about-image">
+                 <img src="./photo/pp.jpg" alt="Ahanaf Shahriar Nafiz Profile Picture">
+            </div>
+       
+        <div class="about-text">
+            <p>Hi, I'm Ahanaf, a passionate developer who loves to build smart web apps using AI, Python, and modern web tools. I'm constantly exploring new technologies and pushing the boundaries of what's possible in web development.</p>
+            <p>With a strong foundation in both frontend and backend technologies, I create seamless digital experiences that combine beautiful design with powerful functionality. My journey in tech is driven by curiosity and a desire to solve real-world problems through code.</p>
+        </div>
+    </div>
+</section>
+
+    <section class="section fade-in" id="skills">
+        <h2 class="section-title">Skills</h2>
+        <div class="skills-grid">
+            <div class="skill-card">
+                <div class="skill-icon">
+                    <i class="fab fa-html5"></i>
+                </div>
+                <div class="skill-name">Web Development</div>
+                <div class="skill-progress">
+                    <div class="skill-progress-bar" data-width="90%"></div>
+                </div>
+            </div>
+            <div class="skill-card">
+                <div class="skill-icon">
+                    <i class="fab fa-python"></i>
+                </div>
+                <div class="skill-name">Python</div>
+                <div class="skill-progress">
+                    <div class="skill-progress-bar" data-width="85%"></div>
+                </div>
+            </div>
+            <div class="skill-card">
+                <div class="skill-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <div class="skill-name">AI</div>
+                <div class="skill-progress">
+                    <div class="skill-progress-bar" data-width="50%"></div>
+                </div>
+                
+            </div>
+             <div class="skill-card">
+                <div class="skill-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="skill-name">SQL</div>
+                <div class="skill-progress">
+                    <div class="skill-progress-bar" data-width="80%"></div>
+                </div>
+                
+            </div>
+            <div class="skill-card">
+                <div class="skill-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="skill-name">C & C++</div>
+                <div class="skill-progress">
+                    <div class="skill-progress-bar" data-width="75%"></div>
+                </div>
+            </div>
+            <div class="skill-card">
+                <div class="skill-icon">
+                    <i class="fab fa-java"></i> </div>
+                <div class="skill-name">Java</div>
+                <div class="skill-progress">
+                    <div class="skill-progress-bar" data-width="82%"></div>
+                </div>
+            </div>
+            <div class="skill-card">
+                <div class="skill-icon">
+                    <i class="fab fa-js-square"></i>
+                </div>
+                <div class="skill-name">JavaScript</div>
+                <div class="skill-progress">
+                    <div class="skill-progress-bar" data-width="88%"></div>
+                </div>
+            </div>
+             <div class="skill-card">
+                <div class="skill-icon">
+                    <i class="fab fa-css3-alt"></i>
+                </div>
+                <div class="skill-name">Css</div>
+                <div class="skill-progress">
+                    <div class="skill-progress-bar" data-width="88%"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="section fade-in" id="projects">
+        <h2 class="section-title">Projects</h2>
+        <div class="projects-grid">
+            <div class="project-card">
+                 <div class="project-image">
+    <img src="./photo/Cal.png" alt="Wish Calculator Project Image">
+    </div>
+                <div class="project-content">
+                    <h3 class="project-title">Wish Calculator</h3>
+                    <p class="project-description">A fully customizable calculator where you can change the look based on your wish.</p> <a href="https://calculator-beta-beige-74.vercel.app/" class="project-link" target="_blank">View Project</a>                </div>
+            </div>
+            <div class="project-card">
+               <div class="project-image">
+    <img src="./photo/tedX.png" alt="TedX Clone Project Image">
+    </div>
+                <div class="project-content">
+                    <h3 class="project-title">TedX Clone</h3>
+                    <p class="project-description">This is a clone of the TedX program website, demonstrating proficiency in modern web layouts.</p> <a href="https://ted-x-puce.vercel.app/" class="project-link" target="_blank">View Project</a>
+                </div>
+            </div>
+            <div class="project-card">
+               <div class="project-image">
+                <img src="./photo/UniAI.png" alt="UniStudy AI Project Image">
+               </div>
+                <div class="project-content">
+                    <h3 class="project-title">UniStudy AI</h3>
+                    <p class="project-description">An AI-powered tool designed to assist students by streamlining their study process and research.</p> <a href="https://uni-ai-2q9g.onrender.com/" class="project-link" target="_blank">View Project</a>
+                </div>
+            </div>
+            <div class="project-card">
+               <div class="project-image">
+                <img src="./photo/SmartAid.png" alt="SmartAid AI Project Image" height="200px" width="300px">
+               </div>
+                <div class="project-content">
+                    <h3 class="project-title">SmartAid </h3>
+                    <p class="project-description">SmartAid is a unique AI-first Django web application that uses Gemini-powered generative AI as its core engine.
+
+                    It's designed to help students excel academically while actively supporting their mental wellbeing through dynamic, responsive features that go beyond static academic resources.</p> <a href="https://github.com/fizeeeti0n/SmartAid" class="project-link" target="_blank">View Project</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<section class="section fade-in" id="experience">
+  <h2 class="section-title">Experience</h2>
+  <div class="timeline">
+    <div class="timeline-item left">
+      <div class="timeline-content">
+        <h3>Vendor Manager</h3>
+        <p class="company">Remote</p>
+        <p class="duration">June 2023 - December 2023</p>
+        <ul>
+          <li>Managed vendors and ensured timely delivery of projects</li>
+          <li>Developed relationships with vendors</li>
+        </ul>
+      </div>
+    </div>
+    <div class="timeline-item right">
+      <div class="timeline-content">
+        <h3>Digital Marketing Intern</h3>
+        <p class="company">10 Minute School</p>
+        <p class="duration">July 2024 - Present</p>
+        <ul>
+          <li>Campaign planning & execution</li>
+          <li>Paid advertising and performance tracking</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section fade-in" id="certificates">
+  <h2 class="section-title">Certificates</h2>
+  <div class="certificate-grid"> 
+    
+    <div class="certificate-card">
+      <div class="certificate-image">
+        <img src="./certificate/Data.png" alt="Deloitte Data Analytics Virtual Internship Certificate" height="200px" width="300px"> 
+      </div>
+      <div class="certificate-content">
+        <h3 class="certificate-title">Data Analytics Certificate</h3>
+        <p>Deloitte Virtual Internship</p>
+        </div>
+    </div>
+    
+    <div class="certificate-card">
+      <div class="certificate-image">
+        <img src="./certificate/Excel.png" alt="Microsoft Excel Certificate" height="200px" width="300px">
+      </div>
+      <div class="certificate-content">
+        <h3 class="certificate-title">MICROSOFT EXCEL</h3>
+        <p>Learned the skill in depth</p>
+        </div>
+    </div>
+    
+  </div>
+</section>
+
+
+<section class="section fade-in" id="contact">
+  <h2 class="section-title">Contact Me</h2>
+  <form class="contact-form" id="contact-form">
+    <div class="form-group">
+      <input type="text" class="form-input" name="name" placeholder=" " required aria-label="Name" />
+      <label class="form-label">Name</label>
+    </div>
+    <div class="form-group">
+      <input type="email" class="form-input" name="email" placeholder=" " required aria-label="Email" />
+      <label class="form-label">Email</label>
+    </div>
+    <div class="form-group">
+      <textarea class="form-input form-textarea" name="message" placeholder=" " required aria-label="Message"></textarea>
+      <label class="form-label">Message</label>
+    </div>
+    <button type="submit" class="submit-btn">
+      <i class="fas fa-paper-plane"></i> Send Message
+    </button>
+  </form>
+</section>
+
+
+
+    <footer class="footer">
+        <div class="social-links">
+            <a href="https://www.facebook.com/fizeeeeti0n" class="social-link" target="_blank" aria-label="Facebook">
+                <i class="fab fa-facebook-f"></i>
+            </a>
+            <a href="https://www.linkedin.com/in/fizeeeeti0n/" class="social-link" target="_blank" aria-label="LinkedIn">
+                <i class="fab fa-linkedin-in"></i>
+            </a>
+            <a href="https://github.com/fizeeeti0n" class="social-link" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                <i class="fab fa-github"></i>
+            </a>
+            <a href="mailto:ahanaf.shahriar.nafiz@gmail.com" class="social-link" aria-label="Email">
+                <i class="fas fa-envelope"></i>
+            </a>
+        </div>
+        <div class="footer-text">
+        <p>&copy; Ahanaf Shahriar Nafiz. All rights reserved.</p>
+        </div>
+    </footer>
+    <script 
+        src="script.js">
+</script>
+
+    <script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+</script>
+<script type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+</script>
+<script type="text/javascript">
+   (function(){
+      emailjs.init({
+        publicKey: "8swwpvfblWBcvJS-u",
+      });
+   })();
+</script>
+    <script>
+  window.addEventListener("load", () => {
+    // FIX: Using querySelector for a more robust selection of the elements
+    const loaderWrapper = document.getElementById("loader-wrapper"); 
+    const mainContent = document.getElementById("main-content");
+
+    // The delay should apply to the removal of the 'hidden' class from the wrapper,
+    // which in turn triggers the CSS transition. The visibility can be set immediately 
+    // after the transition is expected to complete.
+    setTimeout(() => {
+        if (loaderWrapper) {
+            loaderWrapper.classList.add("hidden");
+        }
+        
+        // Wait for the opacity transition to finish (0.8s from CSS) before setting visibility
+        setTimeout(() => {
+            if (mainContent) {
+                mainContent.style.visibility = "visible";
+            }
+        }, 800); 
+
+    }, 1200); // Initial delay to show the spinner (1.2s)
+  });
+</script>
+
+       
+
+
+</body>
+</html>
