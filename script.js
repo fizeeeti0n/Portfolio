@@ -62,7 +62,7 @@ function initThreeJS() {
       "Creative Frontend Developer",
       "AI Enthusiast",
       "AI Automation",
-      "N8n Specialist"
+      "n8n Specialist"
     ];
 
     const typingSpeed = 80;     // ms per character
@@ -325,3 +325,4 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
     initEmailJS();
 });
+
