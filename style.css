@@ -263,6 +263,7 @@ transition: all 0.3s ease;
   background-clip: text; /* fallback */
 }
 
+
     .cursor {
       display: inline-block;
       margin-left: 4px;
@@ -901,5 +902,4 @@ overflow: hidden;
     .skills-grid {
         grid-template-columns: 1fr;
     }
-
 }
