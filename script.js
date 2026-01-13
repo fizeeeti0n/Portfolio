@@ -60,8 +60,8 @@ function initThreeJS() {
 
      const texts = [
       "Creative Frontend Developer",
-      "AI Enthusiast"
-      "AI Automation",   
+      "AI Enthusiast",
+      "AI Automation",
       "N8n Specialist"
     ];
 
@@ -325,4 +325,3 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
     initEmailJS();
 });
-
