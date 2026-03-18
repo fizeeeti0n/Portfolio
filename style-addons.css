@@ -1,0 +1,528 @@
+/* ============================================================
+   style-addons.css
+   Link this AFTER your existing style.css.
+   Contains ONLY the new elements:
+     1. Custom Cursor
+     2. Dark Mode Toggle Button
+     3. Project Category Buttons
+     4. Project Drawer (slide-up panel)
+   No backgrounds — matches your transparent aesthetic.
+   ============================================================ */
+
+
+/* ── 0. Hide default cursor — our custom one takes over ────── */
+*, *::before, *::after {
+    cursor: none !important;
+}
+
+/* ── Cursor dot — snaps instantly to mouse position ─────────── */
+#cursor-dot {
+    position: fixed;
+    width: 6px;
+    height: 6px;
+    background: 	#f70303;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transform: translate(-50%, -50%);
+    will-change: left, top;
+    
+}
+
+/* ── Cursor ring — lags behind with smooth lerp ─────────────── */
+/* #cursor-ring {
+    position: fixed;
+    width: 32px;
+    height: 32px;
+    border: 1.5px solid rgba(194, 166, 105, 0.6);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
+    will-change: left, top;
+}
+/* Expand ring when hovering interactive elements */
+body.cursor-hover #cursor-ring {
+    width: 52px;
+    height: 52px;
+    border-color: rgba(233, 107, 69, 0.7);
+}
+
+body.cursor-hover #cursor-dot {
+    background: #e96b45;
+    box-shadow: 0 0 10px rgba(233, 107, 69, 0.9);
+}
+
+/* Light mode — darker cursor */
+body.light-mode #cursor-dot {
+    background: #1a1a1a;
+    box-shadow: 0 0 6px rgba(0,0,0,0.4);
+}
+
+body.light-mode #cursor-ring {
+    border-color: rgba(0,0,0,0.35);
+}
+
+body.light-mode.cursor-hover #cursor-dot {
+    background: #c2a669;
+}
+
+body.light-mode.cursor-hover #cursor-ring {
+    border-color: rgba(194, 166, 105, 0.7);
+}
+
+
+/* ── 1. DARK MODE TOGGLE — in navbar ───────────────────────── */
+#theme-toggle {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1rem;
+    padding: 0.35rem 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+#theme-toggle:hover {
+    border-color: #c2a669;
+    color: #c2a669;
+    box-shadow: 0 0 12px rgba(194, 166, 105, 0.3);
+}
+
+/* icon swap */
+.icon-moon { display: block; }
+.icon-sun  { display: none;  }
+
+body.light-mode #theme-toggle {
+    border-color: rgba(0, 0, 0, 0.25);
+    color: rgba(0, 0, 0, 0.7);
+}
+
+body.light-mode #theme-toggle:hover {
+    border-color: #c2a669;
+    color: #c2a669;
+}
+
+body.light-mode .icon-moon { display: none;  }
+body.light-mode .icon-sun  { display: block; }
+
+/* Light mode overrides — warm mid-tone grey, reduced whiteness */
+body.light-mode {
+    background: #c8c2b8;
+    color: #1a1a1a;
+}
+
+body.light-mode .nav-link                   { color: rgba(0,0,0,0.8); }
+body.light-mode .about-text                 { color: #1a1a1a; }
+body.light-mode .skill-name                 { color: #1a1a1a; }
+body.light-mode .project-title              { color: #1a1a1a; }
+body.light-mode .project-description        { color: #333; }
+body.light-mode .footer-text                { color: #333; }
+body.light-mode .timeline-content ul li     { color: rgba(0,0,0,0.85); }
+body.light-mode .timeline-content .company,
+body.light-mode .timeline-content .duration { color: rgba(0,0,0,0.55); }
+body.light-mode .timeline-content           { background: rgba(0,0,0,0.04); border-color: rgba(0,0,0,0.12); }
+body.light-mode .social-link                { background: rgba(0,0,0,0.08); color: #333; }
+body.light-mode .form-input                 { color: #1a1a1a; border-color: rgba(0,0,0,0.2); }
+body.light-mode .form-label                 { color: rgba(0,0,0,0.5); }
+body.light-mode .skill-progress             { background: rgba(0,0,0,0.1); }
+body.light-mode .notification               { color: #1a1a1a; background: rgba(255,255,255,0.7); }
+
+
+/* ── 3. PROJECT CATEGORY BUTTONS ───────────────────────────── */
+.project-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.category-btn {
+    position: relative;
+    padding: 0.7rem 1.8rem;
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: transparent;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: 0.03em;
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.category-btn span {
+    position: relative;
+    z-index: 1;
+}
+
+/* gradient fill layer */
+.category-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, #778888, #c2a669, #e96b45);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.category-btn:hover {
+    border-color: transparent;
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 0 18px rgba(194, 166, 105, 0.35);
+}
+
+.category-btn:hover::before         { opacity: 1; }
+.category-btn:hover span            { color: white; }
+
+.category-btn.active                { border-color: transparent; color: white; }
+.category-btn.active::before        { opacity: 1; }
+.category-btn.active span           { color: white; }
+
+/* light mode */
+body.light-mode .category-btn       { border-color: rgba(0,0,0,0.2); color: rgba(0,0,0,0.6); }
+body.light-mode .category-btn:hover { color: white; }
+
+/* small hint text under buttons */
+.project-hint {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.35);
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.04em;
+}
+
+body.light-mode .project-hint { color: rgba(0,0,0,0.35); }
+
+
+/* ── 4. DRAWER BACKDROP ─────────────────────────────────────── */
+.drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    z-index: 4999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+}
+
+.drawer-backdrop.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+/* ── 5. PROJECT DRAWER ──────────────────────────────────────── */
+#project-drawer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70vh;
+    z-index: 5000;
+    transform: translateY(100%);
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+#project-drawer.open {
+    transform: translateY(0);
+}
+
+.drawer-inner {
+    flex: 1;
+    background: transparent;                     /* no background — matches your style */
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 24px 24px 0 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.6);
+    position: relative;
+}
+
+/* drag handle pill */
+.drawer-handle {
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* header row */
+.drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 2rem 2rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+}
+
+.drawer-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    background: linear-gradient(45deg, #778888, #c2a669, #e96b45);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.drawer-count {
+    font-size: 0.82rem;
+    color: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    margin-left: auto;
+    margin-right: 1rem;
+    background: transparent;
+}
+
+/* close button */
+.drawer-close {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.drawer-close:hover {
+    border-color: rgba(233, 107, 69, 0.6);
+    color: white;
+    transform: scale(1.1) rotate(90deg);
+}
+
+/* scrollable body */
+.drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem 2rem 2rem;
+    scroll-behavior: smooth;
+}
+
+.drawer-body::-webkit-scrollbar       { width: 3px; }
+.drawer-body::-webkit-scrollbar-track { background: transparent; }
+.drawer-body::-webkit-scrollbar-thumb {
+    background: rgba(194, 166, 105, 0.4);
+    border-radius: 2px;
+}
+
+/* ── 6. CARDS INSIDE DRAWER ─────────────────────────────────── */
+.drawer-projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 1.5rem;
+}
+
+.drawer-project-card {
+    background: transparent;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+    animation: drawerCardIn 0.4s ease both;
+}
+
+.drawer-project-card:nth-child(1) { animation-delay: 0.00s; }
+.drawer-project-card:nth-child(2) { animation-delay: 0.06s; }
+.drawer-project-card:nth-child(3) { animation-delay: 0.12s; }
+.drawer-project-card:nth-child(4) { animation-delay: 0.18s; }
+.drawer-project-card:nth-child(5) { animation-delay: 0.24s; }
+.drawer-project-card:nth-child(6) { animation-delay: 0.30s; }
+
+@keyframes drawerCardIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0);    }
+}
+
+.drawer-project-card:hover {
+    transform: translateY(-8px) rotateX(3deg) rotateY(3deg);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border-color: rgba(194, 166, 105, 0.4);
+}
+
+/* project image inside drawer */
+.drawer-project-card .proj-img {
+    height: 160px;
+    width: 100%;
+    overflow: hidden;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.drawer-project-card .proj-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.drawer-project-card:hover .proj-img img {
+    transform: scale(1.05);
+}
+
+/* Placeholder — visible when image missing or broken */
+.drawer-project-card .proj-img-placeholder {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background: linear-gradient(135deg,
+        rgba(119,136,136,0.18) 0%,
+        rgba(194,166,105,0.15) 50%,
+        rgba(233,107,69,0.10) 100%);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* When real image loads it sits on z-index:1 and covers placeholder */
+/* When image fails → .no-img added → placeholder promoted */
+.drawer-project-card .proj-img.no-img .proj-img-placeholder {
+    z-index: 2;
+}
+
+.drawer-project-card .proj-img-placeholder i {
+    font-size: 2rem;
+    background: linear-gradient(45deg, #778888, #c2a669, #e96b45);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    opacity: 0.75;
+}
+
+.drawer-project-card .proj-img-placeholder span {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.35);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+body.light-mode .drawer-project-card .proj-img-placeholder {
+    background: linear-gradient(135deg,
+        rgba(119,136,136,0.10) 0%,
+        rgba(194,166,105,0.12) 100%);
+}
+
+body.light-mode .drawer-project-card .proj-img-placeholder span {
+    color: rgba(0,0,0,0.3);
+}
+
+/* content area */
+.drawer-project-card .proj-content {
+    padding: 1.2rem 1.5rem;
+}
+
+.drawer-project-card .proj-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.drawer-project-card .proj-desc {
+    font-size: 0.88rem;
+    color: rgba(255, 255, 255, 0.65);
+    line-height: 1.55;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* reuse your existing .project-link style */
+.drawer-project-card .proj-link {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(45deg, #778888, #c2a669, #e96b45);
+    border-radius: 20px;
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.88rem;
+    transition: all 0.3s ease;
+}
+
+.drawer-project-card .proj-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+}
+
+/* empty state */
+.drawer-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.drawer-empty i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+/* light mode tweaks for drawer */
+body.light-mode .drawer-inner          { border-color: rgba(0,0,0,0.1); }
+body.light-mode .drawer-header         { border-color: rgba(0,0,0,0.1); }
+body.light-mode .drawer-count          { color: rgba(0,0,0,0.4); border-color: rgba(0,0,0,0.15); }
+body.light-mode .drawer-close          { border-color: rgba(0,0,0,0.2); color: rgba(0,0,0,0.5); }
+body.light-mode .drawer-close:hover    { color: #e96b45; }
+body.light-mode .drawer-handle         { background: rgba(0,0,0,0.15); }
+body.light-mode .drawer-project-card   { border-color: rgba(0,0,0,0.1); }
+body.light-mode .drawer-project-card:hover { border-color: rgba(194,166,105,0.5); }
+body.light-mode .drawer-project-card .proj-title { color: #1a1a1a; }
+body.light-mode .drawer-project-card .proj-desc  { color: rgba(0,0,0,0.6); }
+body.light-mode .drawer-count          { border-color: rgba(0,0,0,0.15); }
+body.light-mode .drawer-empty          { color: rgba(0,0,0,0.3); }
+
+
+/* ── 7. RESPONSIVE ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+    #project-drawer         { height: 86vh; }
+    .drawer-projects-grid   { grid-template-columns: 1fr; }
+    .drawer-header          { padding: 1.8rem 1.2rem 0.8rem; }
+    .drawer-body            { padding: 1rem 1.2rem 1.5rem; }
+    #theme-toggle           { bottom: 1.2rem; right: 1.2rem; }
+}
+
+@media (max-width: 480px) {
+    .project-categories     { gap: 0.6rem; }
+    .category-btn           { padding: 0.55rem 1.1rem; font-size: 0.85rem; }
+}
