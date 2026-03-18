@@ -1,36 +1,25 @@
-/* ============================================================
-   style-addons.css
-   Link this AFTER your existing style.css.
-   Contains ONLY the new elements:
-     1. Custom Cursor
-     2. Dark Mode Toggle Button
-     3. Project Category Buttons
-     4. Project Drawer (slide-up panel)
-   No backgrounds — matches your transparent aesthetic.
-   ============================================================ */
 
-
-/* ── 0. Hide default cursor — our custom one takes over ────── */
 *, *::before, *::after {
     cursor: none !important;
 }
 
-/* ── Cursor dot — snaps instantly to mouse position ─────────── */
+/* ── Cursor dot — snaps instantly to mouse / touch position ─── */
 #cursor-dot {
     position: fixed;
-    width: 6px;
-    height: 6px;
-    background: 	#f70303;
+    width: 8px;
+    height: 8px;
+    background: #c2a669;
     border-radius: 50%;
     pointer-events: none;
     z-index: 99999;
     transform: translate(-50%, -50%);
     will-change: left, top;
-    
+    box-shadow: 0 0 6px rgba(194, 166, 105, 0.8);
+    transition: opacity 0.3s ease, background 0.2s ease, transform 0.15s ease;
 }
 
 /* ── Cursor ring — lags behind with smooth lerp ─────────────── */
-/* #cursor-ring {
+#cursor-ring {
     position: fixed;
     width: 32px;
     height: 32px;
@@ -39,10 +28,12 @@
     pointer-events: none;
     z-index: 99998;
     transform: translate(-50%, -50%);
-    transition: width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
+    transition: width 0.2s ease, height 0.2s ease,
+                border-color 0.2s ease, opacity 0.3s ease;
     will-change: left, top;
 }
-/* Expand ring when hovering interactive elements */
+
+/* Expand ring when hovering interactive elements OR touching screen */
 body.cursor-hover #cursor-ring {
     width: 52px;
     height: 52px;
@@ -52,6 +43,26 @@ body.cursor-hover #cursor-ring {
 body.cursor-hover #cursor-dot {
     background: #e96b45;
     box-shadow: 0 0 10px rgba(233, 107, 69, 0.9);
+    transform: translate(-50%, -50%) scale(1.4);
+}
+
+/* Touch — bigger ring so finger tap feels responsive */
+@media (pointer: coarse) {
+    #cursor-ring {
+        width: 44px;
+        height: 44px;
+        border-width: 2px;
+    }
+
+    body.cursor-hover #cursor-ring {
+        width: 68px;
+        height: 68px;
+    }
+
+    #cursor-dot {
+        width: 10px;
+        height: 10px;
+    }
 }
 
 /* Light mode — darker cursor */
@@ -377,7 +388,6 @@ body.light-mode .project-hint { color: rgba(0,0,0,0.35); }
     display: flex;
     align-items: center;
     justify-content: center;
-    position: relative;
 }
 
 .drawer-project-card .proj-img img {
@@ -385,63 +395,10 @@ body.light-mode .project-hint { color: rgba(0,0,0,0.35); }
     height: 100%;
     object-fit: cover;
     transition: transform 0.4s ease;
-    position: relative;
-    z-index: 1;
 }
 
 .drawer-project-card:hover .proj-img img {
     transform: scale(1.05);
-}
-
-/* Placeholder — visible when image missing or broken */
-.drawer-project-card .proj-img-placeholder {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    background: linear-gradient(135deg,
-        rgba(119,136,136,0.18) 0%,
-        rgba(194,166,105,0.15) 50%,
-        rgba(233,107,69,0.10) 100%);
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-    z-index: 0;
-    pointer-events: none;
-}
-
-/* When real image loads it sits on z-index:1 and covers placeholder */
-/* When image fails → .no-img added → placeholder promoted */
-.drawer-project-card .proj-img.no-img .proj-img-placeholder {
-    z-index: 2;
-}
-
-.drawer-project-card .proj-img-placeholder i {
-    font-size: 2rem;
-    background: linear-gradient(45deg, #778888, #c2a669, #e96b45);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    opacity: 0.75;
-}
-
-.drawer-project-card .proj-img-placeholder span {
-    font-size: 0.72rem;
-    font-weight: 600;
-    color: rgba(255,255,255,0.35);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-}
-
-body.light-mode .drawer-project-card .proj-img-placeholder {
-    background: linear-gradient(135deg,
-        rgba(119,136,136,0.10) 0%,
-        rgba(194,166,105,0.12) 100%);
-}
-
-body.light-mode .drawer-project-card .proj-img-placeholder span {
-    color: rgba(0,0,0,0.3);
 }
 
 /* content area */
