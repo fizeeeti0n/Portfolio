@@ -44,7 +44,7 @@ const PROJECTS = [
     {
     title: "Meaw Ghop",
     description: "A VS Code extension that plays a customizable sound whenever a terminal command fails (exits with a non-zero code or matches common error patterns.",
-    image: "/photo/Meaw Ghop.png",
+    image: "/photo/Meaw.png",
     link: "https://marketplace.visualstudio.com/items?itemName=AhanafShahriarNafiz.meaw-ghop",
     categories: ["tools"]
   }
@@ -58,15 +58,10 @@ const CATEGORY_LABELS = {
 };
 
 
-// ============================================================
-// Mouse position — shared with Three.js repulsion
-// ============================================================
+
 const mouse3D = { x: 0, y: 0, active: false };
 
-// ============================================================
-// ★ Custom Cursor — visible dot + trailing ring
-//   Also feeds mouse3D so Three.js particles react
-// ============================================================
+
 function initCustomCursor() {
     const dot  = document.getElementById('cursor-dot');
     const ring = document.getElementById('cursor-ring');
