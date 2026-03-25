@@ -1,7 +1,3 @@
-// ============================================================
-// PROJECT DATA — edit categories here to sort your projects
-// categories can include: "ai", "web", "tools"
-// ============================================================
 const PROJECTS = [
   {
     title: "Wish Calculator",
@@ -36,7 +32,7 @@ const PROJECTS = [
     description: "Smart Job Application Strategist powered by Google Gemini. Cover Letter Generator, ATS & Fit Analysis, and CV Optimization using advanced NLP.",
     image: "./photo/ApexApply AI.png",
     link: "https://apex-apply-ai.vercel.app/",
-    categories: ["ai","web"]
+    categories: ["ai"]
   },
   {
     title: "UAP CSE Iftar",
@@ -72,69 +68,40 @@ const mouse3D = { x: 0, y: 0, active: false };
 //   Also feeds mouse3D so Three.js particles react
 // ============================================================
 function initCustomCursor() {
-    const logo = document.getElementById('cursor-logo');
+    const dot  = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
 
     let mouseX = 0, mouseY = 0;
-    let logoX  = 0, logoY  = 0;
-    let isScrolling  = false;
-    let scrollTimer  = null;
-    let touchFadeTimer = null;
+    let ringX  = 0, ringY  = 0;
 
-    // ── Hide/show during scroll so it never glitches ─────────────
-    function onScrollStart() {
-        if (!isScrolling) {
-            isScrolling = true;
-            logo.style.opacity = '0';
-        }
-        clearTimeout(scrollTimer);
-        scrollTimer = setTimeout(() => {
-            isScrolling = false;
-            if (mouse3D.active) {
-                logo.style.opacity = '1';
-                // Snap to current position — no drift on re-appear
-                logoX = mouseX;
-                logoY = mouseY;
-            }
-        }, 150);
-    }
-    window.addEventListener('scroll', onScrollStart, { passive: true });
-
-    // ── Shared position updater ───────────────────────────────────
-    function onMove(x, y) {
-        mouseX = x;
-        mouseY = y;
-        mouse3D.x      =  (x / window.innerWidth)  * 2 - 1;
-        mouse3D.y      = -(y / window.innerHeight) * 2 + 1;
-        mouse3D.active = true;
-    }
-
-    // ── Mouse events ─────────────────────────────────────────────
     document.addEventListener('mousemove', e => {
-        onMove(e.clientX, e.clientY);
-        if (!isScrolling) logo.style.opacity = '1';
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+
+        // Move dot instantly
+        dot.style.left = mouseX + 'px';
+        dot.style.top  = mouseY + 'px';
+
+        // Feed Three.js — normalised device coords
+        mouse3D.x      =  (mouseX / window.innerWidth)  * 2 - 1;
+        mouse3D.y      = -(mouseY / window.innerHeight) * 2 + 1;
+        mouse3D.active = true;
     });
 
     document.addEventListener('mouseleave', () => {
-        mouse3D.active     = false;
-        logo.style.opacity = '0';
+        mouse3D.active = false;
     });
 
-    document.addEventListener('mouseenter', () => {
-        mouse3D.active = true;
-    });
-
-    // ── Logo follows mouse with smooth lag ────────────────────────
-    (function animateLogo() {
-        if (!isScrolling) {
-            logoX += (mouseX - logoX) * 0.12;
-            logoY += (mouseY - logoY) * 0.12;
-            logo.style.left = logoX + 'px';
-            logo.style.top  = logoY + 'px';
-        }
-        requestAnimationFrame(animateLogo);
+    // Ring follows with smooth lag
+    (function animateRing() {
+        ringX += (mouseX - ringX) * 0.10;
+        ringY += (mouseY - ringY) * 0.10;
+        ring.style.left = ringX + 'px';
+        ring.style.top  = ringY + 'px';
+        requestAnimationFrame(animateRing);
     })();
 
-    // ── Scale up on hover over interactive elements ───────────────
+    // Expand ring on interactive elements
     const hoverSel = 'a, button, input, textarea, .skill-card, .category-btn, .drawer-project-card, .cta-button, .submit-btn, .project-link, .proj-link';
     document.addEventListener('mouseover', e => {
         if (e.target.closest(hoverSel)) document.body.classList.add('cursor-hover');
@@ -142,35 +109,6 @@ function initCustomCursor() {
     document.addEventListener('mouseout', e => {
         if (e.target.closest(hoverSel)) document.body.classList.remove('cursor-hover');
     });
-
-    // ── Touch events ─────────────────────────────────────────────
-    document.addEventListener('touchstart', e => {
-        clearTimeout(touchFadeTimer);
-        document.body.classList.add('cursor-hover');
-        const t = e.touches[0];
-        onMove(t.clientX, t.clientY);
-        logoX = t.clientX;
-        logoY = t.clientY;
-        logo.style.opacity = '1';
-    }, { passive: true });
-
-    document.addEventListener('touchmove', e => {
-        const t = e.touches[0];
-        onMove(t.clientX, t.clientY);
-    }, { passive: true });
-
-    document.addEventListener('touchend', () => {
-        document.body.classList.remove('cursor-hover');
-        touchFadeTimer = setTimeout(() => {
-            mouse3D.active     = false;
-            logo.style.opacity = '0';
-        }, 500);
-    }, { passive: true });
-
-    // Hide on pure touch devices until finger lands
-    if ('ontouchstart' in window && !window.matchMedia('(pointer:fine)').matches) {
-        logo.style.opacity = '0';
-    }
 }
 
 
