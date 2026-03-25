@@ -1,9 +1,8 @@
-
 *, *::before, *::after {
     cursor: none !important;
 }
 
-/* ── Cursor dot — snaps instantly to mouse / touch position ─── */
+/* ── Cursor dot — snaps instantly to mouse position ─────────── */
 #cursor-dot {
     position: fixed;
     width: 8px;
@@ -15,7 +14,6 @@
     transform: translate(-50%, -50%);
     will-change: left, top;
     box-shadow: 0 0 6px rgba(194, 166, 105, 0.8);
-    transition: opacity 0.3s ease, background 0.2s ease, transform 0.15s ease;
 }
 
 /* ── Cursor ring — lags behind with smooth lerp ─────────────── */
@@ -28,12 +26,11 @@
     pointer-events: none;
     z-index: 99998;
     transform: translate(-50%, -50%);
-    transition: width 0.2s ease, height 0.2s ease,
-                border-color 0.2s ease, opacity 0.3s ease;
+    transition: width 0.2s ease, height 0.2s ease, border-color 0.2s ease;
     will-change: left, top;
 }
 
-/* Expand ring when hovering interactive elements OR touching screen */
+/* Expand ring when hovering interactive elements */
 body.cursor-hover #cursor-ring {
     width: 52px;
     height: 52px;
@@ -43,26 +40,6 @@ body.cursor-hover #cursor-ring {
 body.cursor-hover #cursor-dot {
     background: #e96b45;
     box-shadow: 0 0 10px rgba(233, 107, 69, 0.9);
-    transform: translate(-50%, -50%) scale(1.4);
-}
-
-/* Touch — bigger ring so finger tap feels responsive */
-@media (pointer: coarse) {
-    #cursor-ring {
-        width: 44px;
-        height: 44px;
-        border-width: 2px;
-    }
-
-    body.cursor-hover #cursor-ring {
-        width: 68px;
-        height: 68px;
-    }
-
-    #cursor-dot {
-        width: 10px;
-        height: 10px;
-    }
 }
 
 /* Light mode — darker cursor */
