@@ -1,3 +1,7 @@
+// ============================================================
+// PROJECT DATA — edit categories here to sort your projects
+// categories can include: "ai", "web", "tools"
+// ============================================================
 const PROJECTS = [
   {
     title: "Wish Calculator",
@@ -32,7 +36,7 @@ const PROJECTS = [
     description: "Smart Job Application Strategist powered by Google Gemini. Cover Letter Generator, ATS & Fit Analysis, and CV Optimization using advanced NLP.",
     image: "./photo/ApexApply AI.png",
     link: "https://apex-apply-ai.vercel.app/",
-    categories: ["ai"]
+    categories: ["ai","web"]
   },
   {
     title: "UAP CSE Iftar",
@@ -58,123 +62,79 @@ const CATEGORY_LABELS = {
 };
 
 
-
+// ============================================================
+// Mouse position — shared with Three.js repulsion
+// ============================================================
 const mouse3D = { x: 0, y: 0, active: false };
 
-
+// ============================================================
+// ★ Custom Cursor — visible dot + trailing ring
+//   Also feeds mouse3D so Three.js particles react
+// ============================================================
 function initCustomCursor() {
-    const dot  = document.getElementById('cursor-dot');
-    const ring = document.getElementById('cursor-ring');
+    const logo = document.getElementById('cursor-logo');
 
     let mouseX = 0, mouseY = 0;
-    let ringX  = 0, ringY  = 0;
-    let isScrolling = false;
+    let logoX  = 0, logoY  = 0;
+    let isScrolling  = false;
     let scrollTimer  = null;
+    let touchFadeTimer = null;
 
-    // ── Hide cursor elements during scroll to kill the glitch ────
+    // ── Hide/show during scroll so it never glitches ─────────────
     function onScrollStart() {
         if (!isScrolling) {
             isScrolling = true;
-            dot.style.opacity  = '0';
-            ring.style.opacity = '0';
+            logo.style.opacity = '0';
         }
         clearTimeout(scrollTimer);
-        // Restore after scroll fully stops (150 ms of silence)
         scrollTimer = setTimeout(() => {
             isScrolling = false;
-            // Only restore if mouse is still inside the window
             if (mouse3D.active) {
-                dot.style.opacity  = '1';
-                ring.style.opacity = '1';
-                // Snap ring to current dot position instantly — no drift
-                ringX = mouseX;
-                ringY = mouseY;
+                logo.style.opacity = '1';
+                // Snap to current position — no drift on re-appear
+                logoX = mouseX;
+                logoY = mouseY;
             }
         }, 150);
     }
-
     window.addEventListener('scroll', onScrollStart, { passive: true });
+
+    // ── Shared position updater ───────────────────────────────────
+    function onMove(x, y) {
+        mouseX = x;
+        mouseY = y;
+        mouse3D.x      =  (x / window.innerWidth)  * 2 - 1;
+        mouse3D.y      = -(y / window.innerHeight) * 2 + 1;
+        mouse3D.active = true;
+    }
 
     // ── Mouse events ─────────────────────────────────────────────
     document.addEventListener('mousemove', e => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
-
-        if (!isScrolling) {
-            dot.style.left    = mouseX + 'px';
-            dot.style.top     = mouseY + 'px';
-            dot.style.opacity = '1';
-            ring.style.opacity = '1';
-        }
-
-        mouse3D.x      =  (mouseX / window.innerWidth)  * 2 - 1;
-        mouse3D.y      = -(mouseY / window.innerHeight) * 2 + 1;
-        mouse3D.active = true;
+        onMove(e.clientX, e.clientY);
+        if (!isScrolling) logo.style.opacity = '1';
     });
 
     document.addEventListener('mouseleave', () => {
         mouse3D.active     = false;
-        dot.style.opacity  = '0';
-        ring.style.opacity = '0';
+        logo.style.opacity = '0';
     });
 
     document.addEventListener('mouseenter', () => {
         mouse3D.active = true;
     });
 
-   
-    (function animateRing() {
+    // ── Logo follows mouse with smooth lag ────────────────────────
+    (function animateLogo() {
         if (!isScrolling) {
-            ringX += (mouseX - ringX) * 0.10;
-            ringY += (mouseY - ringY) * 0.10;
-            ring.style.left = ringX + 'px';
-            ring.style.top  = ringY + 'px';
+            logoX += (mouseX - logoX) * 0.12;
+            logoY += (mouseY - logoY) * 0.12;
+            logo.style.left = logoX + 'px';
+            logo.style.top  = logoY + 'px';
         }
-        requestAnimationFrame(animateRing);
+        requestAnimationFrame(animateLogo);
     })();
 
-    // ── Touch events ─────────────────────────────────────────────
-    let touchFadeTimer = null;
-
-    function onTouchMove(x, y) {
-        mouseX = x; mouseY = y;
-        dot.style.left    = x + 'px';
-        dot.style.top     = y + 'px';
-        dot.style.opacity  = '1';
-        ring.style.opacity = '1';
-        mouse3D.x      =  (x / window.innerWidth)  * 2 - 1;
-        mouse3D.y      = -(y / window.innerHeight) * 2 + 1;
-        mouse3D.active = true;
-    }
-
-    document.addEventListener('touchstart', e => {
-        clearTimeout(touchFadeTimer);
-        document.body.classList.add('cursor-hover');
-        const t = e.touches[0];
-        onTouchMove(t.clientX, t.clientY);
-    }, { passive: true });
-
-    document.addEventListener('touchmove', e => {
-        const t = e.touches[0];
-        onTouchMove(t.clientX, t.clientY);
-    }, { passive: true });
-
-    document.addEventListener('touchend', () => {
-        document.body.classList.remove('cursor-hover');
-        touchFadeTimer = setTimeout(() => {
-            mouse3D.active     = false;
-            dot.style.opacity  = '0';
-            ring.style.opacity = '0';
-        }, 500);
-    }, { passive: true });
-
-    // Hide on pure touch devices until finger lands
-    if ('ontouchstart' in window && !window.matchMedia('(pointer:fine)').matches) {
-        dot.style.opacity  = '0';
-        ring.style.opacity = '0';
-    }
-
-    // ── Hover expand on mouse interactive elements ────────────────
+    // ── Scale up on hover over interactive elements ───────────────
     const hoverSel = 'a, button, input, textarea, .skill-card, .category-btn, .drawer-project-card, .cta-button, .submit-btn, .project-link, .proj-link';
     document.addEventListener('mouseover', e => {
         if (e.target.closest(hoverSel)) document.body.classList.add('cursor-hover');
@@ -182,6 +142,35 @@ function initCustomCursor() {
     document.addEventListener('mouseout', e => {
         if (e.target.closest(hoverSel)) document.body.classList.remove('cursor-hover');
     });
+
+    // ── Touch events ─────────────────────────────────────────────
+    document.addEventListener('touchstart', e => {
+        clearTimeout(touchFadeTimer);
+        document.body.classList.add('cursor-hover');
+        const t = e.touches[0];
+        onMove(t.clientX, t.clientY);
+        logoX = t.clientX;
+        logoY = t.clientY;
+        logo.style.opacity = '1';
+    }, { passive: true });
+
+    document.addEventListener('touchmove', e => {
+        const t = e.touches[0];
+        onMove(t.clientX, t.clientY);
+    }, { passive: true });
+
+    document.addEventListener('touchend', () => {
+        document.body.classList.remove('cursor-hover');
+        touchFadeTimer = setTimeout(() => {
+            mouse3D.active     = false;
+            logo.style.opacity = '0';
+        }, 500);
+    }, { passive: true });
+
+    // Hide on pure touch devices until finger lands
+    if ('ontouchstart' in window && !window.matchMedia('(pointer:fine)').matches) {
+        logo.style.opacity = '0';
+    }
 }
 
 
@@ -204,7 +193,9 @@ function initThemeToggle() {
 }
 
 
-
+// ============================================================
+// ★ NEW: Project Category Drawer
+// ============================================================
 function initProjectDrawer() {
     const drawer   = document.getElementById('project-drawer');
     const backdrop = document.getElementById('drawer-backdrop');
@@ -624,7 +615,14 @@ function initNavigation() {
     });
 }
 
-
+// === Parallax for Hero Section (ORIGINAL) ===
+window.addEventListener('scroll', () => {
+    const scrolled = window.pageYOffset;
+    const hero = document.querySelector('.hero-content');
+    if (hero) {
+        hero.style.transform = `translateY(${scrolled * 0.3}px)`;
+    }
+});
 
 // === Master Initializer ===
 document.addEventListener('DOMContentLoaded', () => {
