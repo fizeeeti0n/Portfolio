@@ -834,6 +834,263 @@ overflow: hidden;
     margin-top: 1rem;
 }
 
+/* ===== Certificate Card Stack (fanned deck) ===== */
+
+/* 🎨 Colors live here — change these to restyle the whole stack */
+.cert-stack-wrapper {
+    --cert-front-bg: rgba(0, 0, 0, 0.92);
+    --cert-back-card-bg: rgba(0, 0, 0, 0.97);
+    --cert-back-bg: #000;
+    --cert-border: rgba(255, 255, 255, 0.18);
+    --cert-gradient: linear-gradient(45deg, #778888, #c2a669, #e96b45);
+    --cert-tag-color: #c2a669;
+    --cert-nav-color: #e96b45;
+    --cert-dot-inactive: rgba(255, 255, 255, 0.25);
+}
+
+.cert-stack-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.5rem, 3vw, 2rem);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.cert-stack {
+    position: relative;
+    width: min(420px, 68vw);
+    height: 300px;
+    /* extra room so fanned-out cards behind don't get clipped */
+    margin: 20px 0 50px;
+}
+
+.cert-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.55s ease,
+                filter 0.55s ease;
+    transform-origin: bottom center;
+}
+
+.cert-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s;
+    transform-style: preserve-3d;
+    perspective: 1200px;
+}
+
+.cert-card.flipped .cert-card-inner {
+    transform: rotateY(180deg);
+}
+
+.cert-card-front,
+.cert-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 14px;
+    overflow: hidden;
+}
+
+.cert-card-front {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.6rem;
+    padding: 20px 30px;
+    background: var(--cert-front-bg);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border: 1px solid var(--cert-border);
+}
+
+.cert-tag {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--cert-tag-color);
+    border: 1px solid rgba(194, 166, 105, 0.4);
+    padding: 3px 12px;
+    border-radius: 999px;
+}
+
+.cert-card-front h3 {
+    margin: 0;
+    font-size: 1.6rem;
+    background: var(--cert-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.flip-hint {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.flip-hint i {
+    margin-right: 6px;
+}
+
+.cert-card-back {
+    transform: rotateY(180deg);
+    background: var(--cert-back-bg);
+    border: 1px solid var(--cert-border);
+}
+
+.cert-card-back img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Fan-out stack depth positions, assigned dynamically via JS */
+.cert-card.pos-0 { transform: translate(-50%, 0) rotate(0deg) scale(1); left: 50%; z-index: 60; opacity: 1; }
+.cert-card.pos-1 { transform: translate(-50%, 0) translate(26px, 14px) rotate(6deg) scale(0.96); left: 50%; z-index: 50; opacity: 1; }
+.cert-card.pos-2 { transform: translate(-50%, 0) translate(-24px, 26px) rotate(-7deg) scale(0.93); left: 50%; z-index: 40; opacity: 1; }
+.cert-card.pos-3 { transform: translate(-50%, 0) translate(34px, 38px) rotate(9deg) scale(0.90); left: 50%; z-index: 30; opacity: 0.9; }
+.cert-card.pos-4 { transform: translate(-50%, 0) translate(-32px, 48px) rotate(-10deg) scale(0.87); left: 50%; z-index: 20; opacity: 0.75; }
+.cert-card.pos-5 { transform: translate(-50%, 0) translate(0, 58px) rotate(2deg) scale(0.84); left: 50%; z-index: 10; opacity: 0.55; }
+
+.cert-card.pos-1 .cert-card-inner,
+.cert-card.pos-2 .cert-card-inner,
+.cert-card.pos-3 .cert-card-inner,
+.cert-card.pos-4 .cert-card-inner,
+.cert-card.pos-5 .cert-card-inner {
+    filter: brightness(0.7) saturate(0.8);
+}
+
+.cert-card:not(.pos-0):hover {
+    filter: brightness(1.15);
+}
+
+/* Background (non-front) cards: solid opaque face, no visible text/glass */
+.cert-card:not(.pos-0) .cert-card-front {
+    background: var(--cert-back-card-bg);
+}
+
+.cert-card:not(.pos-0) .cert-card-front > * {
+    opacity: 0;
+}
+
+.cert-nav {
+    background: var(--cert-front-bg);
+    border: 1px solid var(--cert-border);
+    color: var(--cert-nav-color);
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: background 0.3s, transform 0.3s;
+    flex-shrink: 0;
+}
+
+.cert-nav:hover {
+    background: rgba(233, 107, 69, 0.15);
+    transform: scale(1.08);
+}
+
+.cert-stack-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+}
+
+.cert-counter {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.6);
+    letter-spacing: 0.05em;
+}
+
+.cert-dots {
+    display: flex;
+    gap: 8px;
+}
+
+.cert-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--cert-dot-inactive);
+    cursor: pointer;
+    transition: background 0.3s, transform 0.3s;
+}
+
+.cert-dot.active {
+    background: linear-gradient(45deg, #c2a669, #e96b45);
+    transform: scale(1.3);
+}
+
+@media (max-width: 768px) {
+    .cert-stack {
+        width: min(340px, 78vw);
+        height: 230px;
+    }
+
+    .cert-card-front h3 {
+        font-size: 1.25rem;
+    }
+
+    .cert-nav {
+        width: 38px;
+        height: 38px;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .cert-stack-wrapper {
+        gap: 0.5rem;
+    }
+
+    .cert-stack {
+        width: min(260px, 68vw);
+        height: 200px;
+        margin: 10px 0 40px;
+    }
+
+    .cert-card-front {
+        padding: 14px;
+    }
+
+    .cert-card-front h3 {
+        font-size: 1rem;
+    }
+
+    .cert-tag {
+        font-size: 0.65rem;
+        padding: 2px 9px;
+    }
+
+    .flip-hint {
+        font-size: 0.7rem;
+    }
+
+    .cert-nav {
+        width: 34px;
+        height: 34px;
+        font-size: 0.85rem;
+    }
+}
+
 
 /* Responsive Design */
 @media (max-width: 768px) {

@@ -562,6 +562,120 @@ window.addEventListener('scroll', () => {
     }
 });
 
+// === Certificate Card Stack (fanned deck) ===
+function initCertStack() {
+    const stack = document.getElementById('cert-stack');
+    if (!stack) return;
+
+    const wrapper = document.querySelector('.cert-stack-wrapper');
+    const cards = Array.from(stack.querySelectorAll('.cert-card'));
+    const counter = document.getElementById('cert-counter');
+    const dotsWrap = document.getElementById('cert-dots');
+    const prevBtn = document.getElementById('cert-prev');
+    const nextBtn = document.getElementById('cert-next');
+
+    const AUTOPLAY_DELAY = 3500; // ms between auto-swipes
+    let autoplayTimer = null;
+
+    // order[0] is always the front-most card's index
+    let order = cards.map((_, i) => i);
+
+    // Build nav dots (one per card)
+    cards.forEach((_, i) => {
+        const dot = document.createElement('span');
+        dot.className = 'cert-dot';
+        dot.setAttribute('role', 'button');
+        dot.setAttribute('aria-label', `Show certificate ${i + 1}`);
+        dot.addEventListener('click', () => {
+            bringToFront(i);
+            restartAutoplay();
+        });
+        dotsWrap.appendChild(dot);
+    });
+    const dots = Array.from(dotsWrap.children);
+
+    function render() {
+        order.forEach((cardIndex, pos) => {
+            const card = cards[cardIndex];
+            card.classList.remove(
+                'pos-0', 'pos-1', 'pos-2', 'pos-3', 'pos-4', 'pos-5', 'flipped'
+            );
+            card.classList.add(`pos-${pos}`);
+        });
+
+        const frontIndex = order[0];
+        counter.textContent = `${frontIndex + 1} / ${cards.length}`;
+        dots.forEach((dot, i) => dot.classList.toggle('active', i === frontIndex));
+    }
+
+    function next() {
+        order.push(order.shift());
+        render();
+    }
+
+    function prev() {
+        order.unshift(order.pop());
+        render();
+    }
+
+    function bringToFront(cardIndex) {
+        const posInOrder = order.indexOf(cardIndex);
+        if (posInOrder <= 0) return;
+        order = order.slice(posInOrder).concat(order.slice(0, posInOrder));
+        render();
+    }
+
+    function startAutoplay() {
+        stopAutoplay();
+        autoplayTimer = setInterval(next, AUTOPLAY_DELAY);
+    }
+
+    function stopAutoplay() {
+        if (autoplayTimer) {
+            clearInterval(autoplayTimer);
+            autoplayTimer = null;
+        }
+    }
+
+    function restartAutoplay() {
+        startAutoplay();
+    }
+
+    cards.forEach((card, cardIndex) => {
+        card.addEventListener('click', () => {
+            if (order[0] === cardIndex) {
+                // Front card: flip to reveal the certificate image
+                const isNowFlipped = card.classList.toggle('flipped');
+                // Pause auto-swipe while viewing the certificate, resume once flipped back
+                if (isNowFlipped) {
+                    stopAutoplay();
+                } else {
+                    restartAutoplay();
+                }
+            } else {
+                // Any other card: bring it to the front
+                bringToFront(cardIndex);
+                restartAutoplay();
+            }
+        });
+    });
+
+    prevBtn.addEventListener('click', () => { prev(); restartAutoplay(); });
+    nextBtn.addEventListener('click', () => { next(); restartAutoplay(); });
+
+    // Pause auto-swipe while the user's mouse is over the stack
+    if (wrapper) {
+        wrapper.addEventListener('mouseenter', stopAutoplay);
+        wrapper.addEventListener('mouseleave', () => {
+            const frontCard = cards[order[0]];
+            if (!frontCard.classList.contains('flipped')) startAutoplay();
+        });
+    }
+
+    render();
+    startAutoplay();
+}
+
 // === Master Initializer ===
 document.addEventListener('DOMContentLoaded', () => {
     initCustomCursor();   // ★ new
@@ -571,4 +685,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initNavigation();
     initProjectDrawer();  // ★ new
     initEmailJS();
+    initCertStack();      // ★ new
 });
