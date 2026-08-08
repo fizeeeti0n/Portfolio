@@ -597,9 +597,7 @@ function initCertStack() {
     function render() {
         order.forEach((cardIndex, pos) => {
             const card = cards[cardIndex];
-            card.classList.remove(
-                'pos-0', 'pos-1', 'pos-2', 'pos-3', 'pos-4', 'pos-5', 'flipped'
-            );
+            card.classList.remove('pos-0', 'pos-1', 'pos-2', 'pos-3', 'pos-4', 'pos-5');
             card.classList.add(`pos-${pos}`);
         });
 
@@ -643,33 +641,24 @@ function initCertStack() {
 
     cards.forEach((card, cardIndex) => {
         card.addEventListener('click', () => {
-            if (order[0] === cardIndex) {
-                // Front card: flip to reveal the certificate image
-                const isNowFlipped = card.classList.toggle('flipped');
-                // Pause auto-swipe while viewing the certificate, resume once flipped back
-                if (isNowFlipped) {
-                    stopAutoplay();
-                } else {
-                    restartAutoplay();
-                }
-            } else {
-                // Any other card: bring it to the front
+            // Clicking a background card brings it to the front.
+            // The front card already shows its name, org, and image,
+            // so clicking it doesn't need to do anything extra.
+            if (order[0] !== cardIndex) {
                 bringToFront(cardIndex);
                 restartAutoplay();
             }
         });
     });
 
-    prevBtn.addEventListener('click', () => { prev(); restartAutoplay(); });
-    nextBtn.addEventListener('click', () => { next(); restartAutoplay(); });
+    // Arrow buttons are optional — guard against them not being in the markup
+    if (prevBtn) prevBtn.addEventListener('click', () => { prev(); restartAutoplay(); });
+    if (nextBtn) nextBtn.addEventListener('click', () => { next(); restartAutoplay(); });
 
     // Pause auto-swipe while the user's mouse is over the stack
     if (wrapper) {
         wrapper.addEventListener('mouseenter', stopAutoplay);
-        wrapper.addEventListener('mouseleave', () => {
-            const frontCard = cards[order[0]];
-            if (!frontCard.classList.contains('flipped')) startAutoplay();
-        });
+        wrapper.addEventListener('mouseleave', startAutoplay);
     }
 
     render();
