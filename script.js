@@ -602,7 +602,7 @@ function initCertStack() {
         });
 
         const frontIndex = order[0];
-        counter.textContent = `${frontIndex + 1} / ${cards.length}`;
+        if (counter) counter.textContent = `${frontIndex + 1} / ${cards.length}`;
         dots.forEach((dot, i) => dot.classList.toggle('active', i === frontIndex));
     }
 
