@@ -574,7 +574,7 @@ function initCertStack() {
     const prevBtn = document.getElementById('cert-prev');
     const nextBtn = document.getElementById('cert-next');
 
-    const AUTOPLAY_DELAY = 3500; // ms between auto-swipes
+    const AUTOPLAY_DELAY = 2500; // ms between auto-swipes
     let autoplayTimer = null;
 
     // order[0] is always the front-most card's index
