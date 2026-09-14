@@ -64,7 +64,7 @@ const CATEGORY_LABELS = {
   ai:    "AI & ML",
   web:   "Web Dev",
   tools: "Tools & Utils",
-  fs:    "Full Stack"
+  fs:    "Full-Stack"
 };
 
 
