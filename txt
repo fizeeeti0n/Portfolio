@@ -1,0 +1,49 @@
+processes=[
+    ["p1",3,5],
+    ["p2",2,2],
+    ["p3",3,3],
+    ["p4",6,4],
+    ["p5",2,9],
+    ["p6",1,5],
+]
+
+n = len(processes)
+
+rem = [p[2] for p in processes]
+time = 0
+comple = 0
+CT = [0]*n
+TAT = [0]*n
+WT = [0]*n
+done = [False] * n
+
+while comple < n:
+  available = []
+  for i in range(n):
+   if processes[i][1]<= time and not done [i]:
+    available.append (i)
+
+  if not available:
+    time +=1
+    continue
+
+
+  index = min(available, key=lambda i: (rem[i], processes[i][1]))
+
+  rem[index] -= 1
+  time += 1
+
+  if rem[index] == 0:
+    CT[index] = time
+    done[index] = True
+    comple += 1
+    TAT[index] = CT[index] - processes[index][1]
+    WT[index] = TAT[index] - processes[index][2]
+
+
+print("Process\tAT\tBT\tCT\tTAT\tWT")
+for i in range(n):
+  print(f"{processes[i][0]}\t{processes[i][1]}\t{processes[i][2]}\t{CT[i]}\t{TAT[i]}\t{WT[i]}")
+
+print(f"Average TAT: {sum(TAT)/n}")
+print(f"Average WT: {sum(WT)/n}")

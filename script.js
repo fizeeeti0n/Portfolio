@@ -41,20 +41,30 @@ const PROJECTS = [
     link: "https://uapcse-iftar.vercel.app",
     categories: ["web"]
   },
-    {
+{
     title: "Meaw Ghop",
     description: "A VS Code extension that plays a customizable sound whenever a terminal command fails (exits with a non-zero code or matches common error patterns.",
     image: "/photo/Meaw.png",
     link: "https://marketplace.visualstudio.com/items?itemName=AhanafShahriarNafiz.meaw-ghop",
     categories: ["tools"]
-  }
+},
+{
+  title: "Uni-Bus",
+  description:
+    "A bus management system for organizations to track and see the real-time location of buses and their routes.",
+  image: "/photo/Uni-Bus.jpg",
+  link: "https://github.com/fizeeeti0n/Uni-Bus",
+  categories: ["fs"]
+}
+
 ];
 
 const CATEGORY_LABELS = {
   all:   "All Projects",
   ai:    "AI & ML",
   web:   "Web Dev",
-  tools: "Tools & Utils"
+  tools: "Tools & Utils",
+  fs:    "Full Stack"
 };
 
 
