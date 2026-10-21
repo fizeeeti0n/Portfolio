@@ -232,6 +232,7 @@ body.light-mode.cursor-hover #cursor-ring {
   position: relative;
   overflow: hidden;
   display: block; /* full clickable area */
+  width: 100%; /* ensure full width clickable */
 }
 
 .nav-link::before {
