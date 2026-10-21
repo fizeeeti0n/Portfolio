@@ -231,6 +231,7 @@ body.light-mode.cursor-hover #cursor-ring {
   transition: color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
   position: relative;
   overflow: hidden;
+  display: block; /* full clickable area */
 }
 
 .nav-link::before {
@@ -245,6 +246,7 @@ body.light-mode.cursor-hover #cursor-ring {
   z-index: -1;
   border-radius: 25px;
   opacity: 0;
+  pointer-events: none;
 }
 
 .nav-link:hover,

@@ -522,7 +522,18 @@ function initNavigation() {
   });
 
   navLinks.forEach(link => {
-    link.addEventListener('click', () => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const href = link.getAttribute('href');
+      const targetId = href && href.startsWith('#') ? href.slice(1) : href;
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth' });
+      }
+      if (targetId) {
+        const newPath = `/${targetId}`;
+        history.pushState(null, '', newPath);
+      }
       navMenu.classList.remove('active');
       mobileToggle.innerHTML = BARS_SVG;
       mobileToggle.setAttribute('aria-expanded', 'false');
