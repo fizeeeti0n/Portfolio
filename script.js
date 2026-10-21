@@ -1,62 +1,63 @@
+/* ============================================================
+   PROJECTS DATA
+   ============================================================ */
 const PROJECTS = [
   {
     title: "Wish Calculator",
     description: "A fully customizable calculator where you can change the look based on your wish.",
-    image: "./photo/Cal.png",
+    image: "./photo/Cal.webp",
     link: "https://calculator-beta-beige-74.vercel.app/",
     categories: ["web", "tools"]
   },
   {
     title: "TedX Clone",
     description: "This is a clone of the TedX program website, demonstrating proficiency in modern web layouts.",
-    image: "./photo/tedX.png",
+    image: "./photo/tedX.webp",
     link: "https://ted-x-puce.vercel.app/",
     categories: ["web"]
   },
   {
     title: "UniStudy AI",
     description: "An AI-powered tool designed to assist students by streamlining their study process and research.",
-    image: "./photo/UniAI.png",
+    image: "./photo/UniAI.webp",
     link: "https://uni-ai-2q9g.onrender.com/",
     categories: ["ai", "web"]
   },
   {
     title: "SmartAid",
     description: "A Django web application powered by Gemini AI. Helps students excel academically while supporting mental wellbeing through dynamic, responsive features.",
-    image: "./photo/SmartAid.png",
+    image: "./photo/SmartAid.webp",
     link: "https://github.com/fizeeeti0n/SmartAid",
     categories: ["ai", "web"]
   },
   {
     title: "ApexApply AI",
     description: "Smart Job Application Strategist powered by Google Gemini. Cover Letter Generator, ATS & Fit Analysis, and CV Optimization using advanced NLP.",
-    image: "./photo/ApexApply AI.png",
+    image: "./photo/ApexApply AI.webp",
     link: "https://apex-apply-ai.vercel.app/",
     categories: ["ai"]
   },
   {
     title: "UAP CSE Iftar",
     description: "Official website for the UAP Department of CSE Ramadan Iftar Mahfil event — event details, RSVP, and community announcements.",
-    image: "./photo/Uap CSE Iftar.png",
+    image: "./photo/Uap CSE Iftar.webp",
     link: "https://uapcse-iftar.vercel.app",
     categories: ["web"]
   },
-{
+  {
     title: "Meaw Ghop",
-    description: "A VS Code extension that plays a customizable sound whenever a terminal command fails (exits with a non-zero code or matches common error patterns.",
-    image: "/photo/Meaw.png",
+    description: "A VS Code extension that plays a customizable sound whenever a terminal command fails (exits with a non-zero code or matches common error patterns).",
+    image: "/photo/Meaw.webp",
     link: "https://marketplace.visualstudio.com/items?itemName=AhanafShahriarNafiz.meaw-ghop",
     categories: ["tools"]
-},
-{
-  title: "Uni-Bus",
-  description:
-    "A bus management system for organizations to track and see the real-time location of buses and their routes.",
-  image: "/photo/Uni-Bus.jpg",
-  link: "https://github.com/fizeeeti0n/Uni-Bus",
-  categories: ["fs"]
-}
-
+  },
+  {
+    title: "Uni-Bus",
+    description: "A bus management system for organizations to track and see the real-time location of buses and their routes.",
+    image: "/photo/Uni-Bus.jpg",
+    link: "https://github.com/fizeeeti0n/Uni-Bus",
+    categories: ["fs"]
+  }
 ];
 
 const CATEGORY_LABELS = {
@@ -67,622 +68,671 @@ const CATEGORY_LABELS = {
   fs:    "Full-Stack"
 };
 
-
-// ============================================================
-// Mouse position — shared with Three.js repulsion
-// ============================================================
+/* ============================================================
+   MOUSE POSITION — shared with Three.js repulsion
+   ============================================================ */
 const mouse3D = { x: 0, y: 0, active: false };
 
-// ============================================================
-// ★ Custom Cursor — visible dot + trailing ring
-//   Also feeds mouse3D so Three.js particles react
-// ============================================================
+/* ============================================================
+   CUSTOM CURSOR
+   ============================================================ */
 function initCustomCursor() {
-    const dot  = document.getElementById('cursor-dot');
-    const ring = document.getElementById('cursor-ring');
+  const dot  = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  if (!dot || !ring) return;
 
-    let mouseX = 0, mouseY = 0;
-    let ringX  = 0, ringY  = 0;
+  let mouseX = 0, mouseY = 0;
+  let ringX  = 0, ringY  = 0;
 
-    document.addEventListener('mousemove', e => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
 
-        // Move dot instantly
-        dot.style.left = mouseX + 'px';
-        dot.style.top  = mouseY + 'px';
+    dot.style.left = mouseX + 'px';
+    dot.style.top  = mouseY + 'px';
 
-        // Feed Three.js — normalised device coords
-        mouse3D.x      =  (mouseX / window.innerWidth)  * 2 - 1;
-        mouse3D.y      = -(mouseY / window.innerHeight) * 2 + 1;
-        mouse3D.active = true;
-    });
+    mouse3D.x      =  (mouseX / window.innerWidth)  * 2 - 1;
+    mouse3D.y      = -(mouseY / window.innerHeight) * 2 + 1;
+    mouse3D.active = true;
+  }, { passive: true });
 
-    document.addEventListener('mouseleave', () => {
-        mouse3D.active = false;
-    });
+  document.addEventListener('mouseleave', () => { mouse3D.active = false; });
 
-    // Ring follows with smooth lag
-    (function animateRing() {
-        ringX += (mouseX - ringX) * 0.10;
-        ringY += (mouseY - ringY) * 0.10;
-        ring.style.left = ringX + 'px';
-        ring.style.top  = ringY + 'px';
-        requestAnimationFrame(animateRing);
-    })();
+  (function animateRing() {
+    ringX += (mouseX - ringX) * 0.10;
+    ringY += (mouseY - ringY) * 0.10;
+    ring.style.left = ringX + 'px';
+    ring.style.top  = ringY + 'px';
+    requestAnimationFrame(animateRing);
+  })();
 
-    // Expand ring on interactive elements
-    const hoverSel = 'a, button, input, textarea, .skill-card, .category-btn, .drawer-project-card, .cta-button, .submit-btn, .project-link, .proj-link';
-    document.addEventListener('mouseover', e => {
-        if (e.target.closest(hoverSel)) document.body.classList.add('cursor-hover');
-    });
-    document.addEventListener('mouseout', e => {
-        if (e.target.closest(hoverSel)) document.body.classList.remove('cursor-hover');
-    });
+  const hoverSel = 'a,button,input,textarea,.skill-card,.category-btn,.drawer-project-card,.cta-button,.submit-btn,.project-link,.proj-link,.cert-dot,.cert-card';
+  document.addEventListener('mouseover', e => {
+    if (e.target.closest(hoverSel)) document.body.classList.add('cursor-hover');
+  }, { passive: true });
+  document.addEventListener('mouseout', e => {
+    if (e.target.closest(hoverSel)) document.body.classList.remove('cursor-hover');
+  }, { passive: true });
 }
 
-
-// ============================================================
-// ★ NEW: Dark / Light Mode Toggle
-// ============================================================
+/* ============================================================
+   THEME TOGGLE
+   ============================================================ */
 function initThemeToggle() {
-    const btn = document.getElementById('theme-toggle');
-    if (!btn) return;
+  const btn = document.getElementById('theme-toggle');
+  if (!btn) return;
 
-    if (localStorage.getItem('portfolio-theme') === 'light') {
-        document.body.classList.add('light-mode');
-    }
+  if (localStorage.getItem('portfolio-theme') === 'light') {
+    document.body.classList.add('light-mode');
+  }
 
-    btn.addEventListener('click', () => {
-        document.body.classList.toggle('light-mode');
-        localStorage.setItem('portfolio-theme',
-            document.body.classList.contains('light-mode') ? 'light' : 'dark');
-    });
+  btn.addEventListener('click', () => {
+    document.body.classList.toggle('light-mode');
+    localStorage.setItem('portfolio-theme',
+      document.body.classList.contains('light-mode') ? 'light' : 'dark');
+  });
 }
 
-
-// ============================================================
-// ★ NEW: Project Category Drawer
-// ============================================================
+/* ============================================================
+   PROJECT CATEGORY DRAWER
+   ============================================================ */
 function initProjectDrawer() {
-    const drawer   = document.getElementById('project-drawer');
-    const backdrop = document.getElementById('drawer-backdrop');
-    const closeBtn = document.getElementById('drawer-close');
-    const titleEl  = document.getElementById('drawer-title');
-    const countEl  = document.getElementById('drawer-count');
-    const bodyEl   = document.getElementById('drawer-body');
-    const catBtns  = document.querySelectorAll('.category-btn');
+  const drawer   = document.getElementById('project-drawer');
+  const backdrop = document.getElementById('drawer-backdrop');
+  const closeBtn = document.getElementById('drawer-close');
+  const titleEl  = document.getElementById('drawer-title');
+  const countEl  = document.getElementById('drawer-count');
+  const bodyEl   = document.getElementById('drawer-body');
+  const catBtns  = document.querySelectorAll('.category-btn');
 
-    if (!drawer || !backdrop) return;
+  if (!drawer || !backdrop) return;
 
-    function renderCard(p) {
-        return `
-        <div class="drawer-project-card">
-            <div class="proj-img">
-                <img src="${p.image}" alt="${p.title}" loading="lazy"
-                     onerror="this.parentElement.style.display='none'">
-            </div>
-            <div class="proj-content">
-                <h3 class="proj-title">${p.title}</h3>
-                <p class="proj-desc">${p.description}</p>
-                <a href="${p.link}" class="proj-link" target="_blank" rel="noopener noreferrer">
-                    <i class="fas fa-external-link-alt"></i> View Project
-                </a>
-            </div>
-        </div>`;
-    }
+  function renderCard(p) {
+    return `
+      <div class="drawer-project-card">
+        <div class="proj-img">
+          <img src="${p.image}" alt="${p.title}" loading="lazy" decoding="async"
+               onerror="this.parentElement.style.display='none'">
+        </div>
+        <div class="proj-content">
+          <h3 class="proj-title">${p.title}</h3>
+          <p class="proj-desc">${p.description}</p>
+          <a href="${p.link}" class="proj-link" target="_blank" rel="noopener noreferrer">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="14" height="14" style="vertical-align:-2px;margin-right:4px;fill:currentColor" aria-hidden="true"><path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3l0 82.7c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 32C35.8 32 0 67.8 0 112L0 432c0 44.2 35.8 80 80 80l320 0c44.2 0 80-35.8 80-80l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-320c0-8.8 7.2-16 16-16l112 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 32z"/></svg>
+            View Project
+          </a>
+        </div>
+      </div>`;
+  }
 
-    function openDrawer(category) {
-        const filtered = category === 'all'
-            ? PROJECTS
-            : PROJECTS.filter(p => p.categories.includes(category));
+  function openDrawer(category) {
+    const filtered = category === 'all'
+      ? PROJECTS
+      : PROJECTS.filter(p => p.categories.includes(category));
 
-        titleEl.textContent = CATEGORY_LABELS[category] || 'Projects';
-        countEl.textContent = `${filtered.length} project${filtered.length !== 1 ? 's' : ''}`;
+    titleEl.textContent = CATEGORY_LABELS[category] || 'Projects';
+    countEl.textContent = `${filtered.length} project${filtered.length !== 1 ? 's' : ''}`;
 
-        bodyEl.innerHTML = filtered.length
-            ? `<div class="drawer-projects-grid">${filtered.map(renderCard).join('')}</div>`
-            : `<div class="drawer-empty"><i class="fas fa-folder-open"></i><p>No projects here yet.</p></div>`;
+    bodyEl.innerHTML = filtered.length
+      ? `<div class="drawer-projects-grid">${filtered.map(renderCard).join('')}</div>`
+      : `<div class="drawer-empty"><p>No projects here yet.</p></div>`;
 
-        drawer.classList.add('open');
-        backdrop.classList.add('visible');
-        document.body.style.overflow = 'hidden';
-    }
+    drawer.classList.add('open');
+    backdrop.classList.add('visible');
+    document.body.style.overflow = 'hidden';
+  }
 
-    function closeDrawer() {
-        drawer.classList.remove('open');
-        backdrop.classList.remove('visible');
-        document.body.style.overflow = '';
-        catBtns.forEach(b => b.classList.remove('active'));
-    }
+  function closeDrawer() {
+    drawer.classList.remove('open');
+    backdrop.classList.remove('visible');
+    document.body.style.overflow = '';
+    catBtns.forEach(b => b.classList.remove('active'));
+  }
 
-    catBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            catBtns.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            openDrawer(btn.dataset.category);
-        });
+  catBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      catBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      openDrawer(btn.dataset.category);
     });
+  });
 
-    if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
-    backdrop.addEventListener('click', closeDrawer);
-    document.addEventListener('keydown', e => {
-        if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
-    });
+  if (closeBtn) closeBtn.addEventListener('click', closeDrawer);
+  backdrop.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && drawer.classList.contains('open')) closeDrawer();
+  });
 }
 
-
-// ============================================================
-// Three.js — original 3 floating layers + cursor repulsion
-// ============================================================
+/* ============================================================
+   THREE.JS — loaded lazily after window load
+   Skip on mobile (<768px) and prefers-reduced-motion
+   ============================================================ */
 function initThreeJS() {
-    const canvas   = document.getElementById('global-canvas');
-    const scene    = new THREE.Scene();
-    const camera   = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true });
+  if (window.innerWidth < 768) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (typeof THREE === 'undefined') return;
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x000000, 0);
-    camera.position.z = 1000;
+  const canvas   = document.getElementById('global-canvas');
+  const scene    = new THREE.Scene();
+  const camera   = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, powerPreference: 'low-power' });
 
-    // ── ORIGINAL 3 floating / rotating layers ──────────────────
-    // Each layer stores home positions so repulsion can spring back
-    const particleSystems = [];
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setClearColor(0x000000, 0);
+  camera.position.z = 1000;
 
-    const createParticles = (count, range, size, opacity, speed) => {
-        const positions = new Float32Array(count * 3);
-        for (let i = 0; i < count * 3; i++) {
-            positions[i] = (Math.random() - 0.5) * range;
-        }
-        // home = copy of original random positions
-        const home = positions.slice();
-        const vel  = new Float32Array(count * 3);
+  const particleSystems = [];
 
-        const geometry = new THREE.BufferGeometry();
-        geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  function createParticles(count, range, size, opacity, speed) {
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < count * 3; i++) {
+      positions[i] = (Math.random() - 0.5) * range;
+    }
+    const home = positions.slice();
+    const vel  = new Float32Array(count * 3);
 
-        const material = new THREE.PointsMaterial({
-            color: 0x00f5ff, size, transparent: true, opacity
-        });
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-        const points = new THREE.Points(geometry, material);
-        scene.add(points);
-        particleSystems.push({ points, speed, positions, home, vel, count });
-    };
+    const material = new THREE.PointsMaterial({ color: 0x00f5ff, size, transparent: true, opacity });
+    const points   = new THREE.Points(geometry, material);
+    scene.add(points);
+    particleSystems.push({ points, speed, positions, home, vel, count });
+  }
 
-    // Exact original counts / sizes / opacities / speeds
-    createParticles(1500, 3000, 1,   0.3, { x: 0.0005, y: 0.001  });
-    createParticles(800,  2000, 2.5, 0.6, { x: 0.001,  y: 0.0015 });
-    createParticles(400,  2500, 1.8, 0.4, { x: 0.0008, y: 0.0012 });
+  createParticles(1500, 3000, 1,   0.3, { x: 0.0005, y: 0.001  });
+  createParticles(800,  2000, 2.5, 0.6, { x: 0.001,  y: 0.0015 });
+  createParticles(400,  2500, 1.8, 0.4, { x: 0.0008, y: 0.0012 });
 
-    // ── Mouse → world helpers ───────────────────────────────────
-    const mouseWorld = new THREE.Vector3();
-    const raycaster  = new THREE.Raycaster();
-    const mouseNDC   = new THREE.Vector2();
+  const mouseWorld = new THREE.Vector3();
+  const raycaster  = new THREE.Raycaster();
+  const mouseNDC   = new THREE.Vector2();
 
-    // Repulsion constants
-    const REPEL_R   = 200;    // world-unit radius of influence
-    const REPEL_STR = 600;    // push force strength
-    const RETURN    = 0.045;  // spring-back speed
-    const DAMP      = 0.80;   // velocity damping
+  const REPEL_R   = 200;
+  const REPEL_STR = 600;
+  const RETURN    = 0.045;
+  const DAMP      = 0.80;
 
-    // ── Animate ─────────────────────────────────────────────────
-    function animate() {
-        requestAnimationFrame(animate);
-        const time = Date.now() * 0.0005;
+  function animate() {
+    requestAnimationFrame(animate);
+    const time = Date.now() * 0.0005;
 
-        // Project mouse into world space (z=0 plane)
-        if (mouse3D.active) {
-            mouseNDC.set(mouse3D.x, mouse3D.y);
-            raycaster.setFromCamera(mouseNDC, camera);
-            const t = -raycaster.ray.origin.z / raycaster.ray.direction.z;
-            mouseWorld.copy(raycaster.ray.origin).addScaledVector(raycaster.ray.direction, t);
-        }
-
-        particleSystems.forEach((sys, index) => {
-            // ── Original floating behaviour (rotation + float) ──
-            sys.points.rotation.x += sys.speed.x;
-            sys.points.rotation.y += sys.speed.y;
-            sys.points.position.y  = Math.sin(time + index) * 10;
-            sys.points.position.x  = Math.cos(time + index * 0.5) * 5;
-
-            // ── Cursor repulsion on each particle ──────────────
-            // We work in LOCAL space to account for the object's
-            // own rotation/translation by inverting it back.
-            const inv = new THREE.Matrix4().copy(sys.points.matrixWorld).invert();
-            const localMouse = mouseWorld.clone().applyMatrix4(inv);
-
-            const pos = sys.positions;
-            const vel = sys.vel;
-            const home = sys.home;
-
-            for (let i = 0; i < sys.count; i++) {
-                const ix = i * 3, iy = ix + 1, iz = ix + 2;
-                const cx = pos[ix], cy = pos[iy];
-
-                if (mouse3D.active) {
-                    const dx   = cx - localMouse.x;
-                    const dy   = cy - localMouse.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
-                    if (dist < REPEL_R) {
-                        const f = ((REPEL_R - dist) / REPEL_R);
-                        vel[ix] += (dx / dist) * f * f * REPEL_STR * 0.016;
-                        vel[iy] += (dy / dist) * f * f * REPEL_STR * 0.016;
-                    }
-                }
-
-                // Spring back to home
-                vel[ix] += (home[ix] - cx) * RETURN;
-                vel[iy] += (home[iy] - cy) * RETURN;
-
-                // Damp + integrate
-                vel[ix] *= DAMP;
-                vel[iy] *= DAMP;
-                pos[ix]  += vel[ix];
-                pos[iy]  += vel[iy];
-                pos[iz]   = home[iz]; // z unchanged
-            }
-
-            sys.points.geometry.attributes.position.needsUpdate = true;
-        });
-
-        renderer.render(scene, camera);
+    if (mouse3D.active) {
+      mouseNDC.set(mouse3D.x, mouse3D.y);
+      raycaster.setFromCamera(mouseNDC, camera);
+      const t = -raycaster.ray.origin.z / raycaster.ray.direction.z;
+      mouseWorld.copy(raycaster.ray.origin).addScaledVector(raycaster.ray.direction, t);
     }
 
-    animate();
+    particleSystems.forEach((sys, index) => {
+      sys.points.rotation.x += sys.speed.x;
+      sys.points.rotation.y += sys.speed.y;
+      sys.points.position.y  = Math.sin(time + index) * 10;
+      sys.points.position.x  = Math.cos(time + index * 0.5) * 5;
 
-     const texts = [
-      "Creative Frontend Developer",
-      "AI Enthusiast",
-      "AI Automation",
-      "N8n Specialist"
-    ];
+      const inv        = new THREE.Matrix4().copy(sys.points.matrixWorld).invert();
+      const localMouse = mouseWorld.clone().applyMatrix4(inv);
+      const pos        = sys.positions;
+      const vel        = sys.vel;
+      const home       = sys.home;
 
-    const typingSpeed = 80;
-    const deletingSpeed = 50;
-    const pauseAfterTyping = 1200;
+      for (let i = 0; i < sys.count; i++) {
+        const ix = i * 3, iy = ix + 1, iz = ix + 2;
+        const cx = pos[ix], cy = pos[iy];
 
-    const textElement = document.getElementById("typing-text");
-
-    let textIndex = 0;
-    let charIndex = 0;
-    let isDeleting = false;
-
-    function typeLoop() {
-      const currentText = texts[textIndex];
-
-      if (!isDeleting) {
-        textElement.textContent = currentText.slice(0, charIndex + 1);
-        charIndex++;
-        if (charIndex === currentText.length) {
-          setTimeout(() => isDeleting = true, pauseAfterTyping);
+        if (mouse3D.active) {
+          const dx   = cx - localMouse.x;
+          const dy   = cy - localMouse.y;
+          const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
+          if (dist < REPEL_R) {
+            const f = (REPEL_R - dist) / REPEL_R;
+            vel[ix] += (dx / dist) * f * f * REPEL_STR * 0.016;
+            vel[iy] += (dy / dist) * f * f * REPEL_STR * 0.016;
+          }
         }
-      } else {
-        textElement.textContent = currentText.slice(0, charIndex - 1);
-        charIndex--;
-        if (charIndex === 0) {
-          isDeleting = false;
-          textIndex = (textIndex + 1) % texts.length;
-        }
+
+        vel[ix] += (home[ix] - cx) * RETURN;
+        vel[iy] += (home[iy] - cy) * RETURN;
+        vel[ix] *= DAMP;
+        vel[iy] *= DAMP;
+        pos[ix]  += vel[ix];
+        pos[iy]  += vel[iy];
+        pos[iz]   = home[iz];
       }
 
-      setTimeout(typeLoop, isDeleting ? deletingSpeed : typingSpeed);
-    }
-
-    typeLoop();
-
-    // Resize handling
-    window.addEventListener('resize', () => {
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(window.innerWidth, window.innerHeight);
+      sys.points.geometry.attributes.position.needsUpdate = true;
     });
 
-    // Scroll — tilt all layers gently
-    window.addEventListener('scroll', () => {
-        const scrolled = window.pageYOffset * 0.0005;
-        particleSystems.forEach((sys, i) => {
-            sys.points.rotation.z = scrolled * (i + 1) * 0.1;
-        });
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }, { passive: true });
+
+  window.addEventListener('scroll', () => {
+    const scrolled = window.pageYOffset * 0.0005;
+    particleSystems.forEach((sys, i) => {
+      sys.points.rotation.z = scrolled * (i + 1) * 0.1;
     });
+  }, { passive: true });
 }
 
-// === Scroll animations (fade-in, skill bars) (ORIGINAL) ===
+/* ============================================================
+   TYPING EFFECT — runs independently from Three.js
+   ============================================================ */
+function initTyping() {
+  const textElement = document.getElementById('typing-text');
+  if (!textElement) return;
+
+  const texts = [
+    'Creative Frontend Developer',
+    'AI Enthusiast',
+    'AI Automation',
+    'N8n Specialist'
+  ];
+
+  const typingSpeed  = 80;
+  const deletingSpeed = 50;
+  const pauseAfterTyping = 1200;
+
+  let textIndex  = 0;
+  let charIndex  = 0;
+  let isDeleting = false;
+
+  function typeLoop() {
+    const currentText = texts[textIndex];
+
+    if (!isDeleting) {
+      textElement.textContent = currentText.slice(0, charIndex + 1);
+      charIndex++;
+      if (charIndex === currentText.length) {
+        setTimeout(() => { isDeleting = true; typeLoop(); }, pauseAfterTyping);
+        return;
+      }
+    } else {
+      textElement.textContent = currentText.slice(0, charIndex - 1);
+      charIndex--;
+      if (charIndex === 0) {
+        isDeleting = false;
+        textIndex  = (textIndex + 1) % texts.length;
+      }
+    }
+
+    setTimeout(typeLoop, isDeleting ? deletingSpeed : typingSpeed);
+  }
+
+  typeLoop();
+}
+
+/* ============================================================
+   SCROLL ANIMATIONS — IntersectionObserver, opacity+transform
+   ============================================================ */
 function handleScrollAnimations() {
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
+  // Batch: collect all reads first, then write
+  const observer = new IntersectionObserver((entries) => {
+    // All DOM reads happen inside callback (already batched by browser)
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
 
-                if (entry.target.id === 'skills') {
-                    const bars = entry.target.querySelectorAll('.skill-progress-bar');
-                    bars.forEach(bar => {
-                        const width = bar.getAttribute('data-width');
-                        if (!bar.classList.contains('filled')) {
-                            setTimeout(() => {
-                                bar.style.width = width;
-                                bar.classList.add('filled');
-                            }, 500);
-                        }
-                    });
-                }
-            }
-        });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-}
-
-window.addEventListener("load", () => {
-  const loaderWrapper = document.getElementById("loader-wrapper");
-  const mainContent = document.getElementById("main-content");
-
-  setTimeout(() => {
-    loaderWrapper.classList.add("hidden");
-    mainContent.style.visibility = "visible";
-  }, 1200);
-});
-
-// === Notification Toast (ORIGINAL) ===
-function showNotification(message, type) {
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.innerHTML = `
-        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
-        <span>${message}</span>
-    `;
-
-    document.body.appendChild(notification);
-    setTimeout(() => notification.classList.add('show'), 100);
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => notification.remove(), 300);
-    }, 5000);
-}
-
-// === EmailJS: Contact Form Submission (ORIGINAL) ===
-function initEmailJS() {
-    if (typeof emailjs === 'undefined') {
-        console.error("EmailJS SDK not loaded.");
-        return; 
-    }
-    
-    try {
-        emailjs.init("8swwpvfblWBcvJS-u");
-    } catch (e) {
-        console.error("EmailJS initialization failed:", e);
-        return;
-    }
-
-    const form = document.getElementById("contact-form");
-    if (!form) {
-        console.error("The contact form with ID 'contact-form' was not found.");
-        return;
-    }
-
-    const button = form.querySelector("button[type='submit']");
-    if (!button) {
-        console.error("No submit button found inside the contact form.");
-        return;
-    }
-    
-    const originalText = button.innerHTML;
-    const serviceID = 'service_578o5c8';
-    const templateID = 'template_u6qazit';
-
-    form.addEventListener("submit", function (e) {
-        e.preventDefault();
-        
-        button.disabled = true;
-        button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
-
-        emailjs.sendForm(serviceID, templateID, form)
-            .then((response) => {
-                console.log("Email sent successfully:", response);
-                button.innerHTML = '<i class="fas fa-check"></i> Message Sent Successfully!';
-                
-                if (typeof showNotification === 'function') {
-                    showNotification("Message sent successfully! I'll get back to you soon.", "success");
-                }
-                
+        if (entry.target.id === 'skills') {
+          const bars = entry.target.querySelectorAll('.skill-progress-bar');
+          // Schedule writes after all reads done
+          requestAnimationFrame(() => {
+            bars.forEach(bar => {
+              if (!bar.classList.contains('filled')) {
+                const width = bar.getAttribute('data-width');
                 setTimeout(() => {
-                    button.innerHTML = originalText;
-                    button.disabled = false;
-                    form.reset();
-                }, 3000);
-            })
-            .catch((error) => {
-                console.error("Email sending failed:", error);
-                button.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Failed to Send';
-                
-                if (typeof showNotification === 'function') {
-                    showNotification("Failed to send message. Try again later or email directly.", "error");
-                }
-                
-                setTimeout(() => {
-                    button.innerHTML = originalText;
-                    button.disabled = false;
-                }, 3000);
+                  bar.style.width = width;
+                  bar.classList.add('filled');
+                }, 500);
+              }
             });
+          });
+        }
+      }
     });
+  }, { threshold: 0.1 });
+
+  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 }
 
-// === Navigation (ORIGINAL) ===
-function initNavigation() {
-    const navbar = document.getElementById('navbar');
-    const navLinks = document.querySelectorAll('.nav-link');
-    const mobileToggle = document.getElementById('mobile-toggle');
-    const navMenu = document.getElementById('nav-menu');
-    const sections = document.querySelectorAll('section[id]');
+/* ============================================================
+   NOTIFICATION TOAST
+   ============================================================ */
+function showNotification(message, type) {
+  const notification = document.createElement('div');
+  notification.className = `notification ${type}`;
+  const icon = type === 'success'
+    ? '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 512 512" style="fill:currentColor" aria-hidden="true"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg>'
+    : '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 512 512" style="fill:currentColor" aria-hidden="true"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zm-32 224a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>';
+  notification.innerHTML = `${icon}<span>${message}</span>`;
 
-    mobileToggle.addEventListener('click', () => {
-        navMenu.classList.toggle('active');
-        const icon = mobileToggle.querySelector('i');
-        icon.classList.toggle('fa-bars');
-        icon.classList.toggle('fa-times');
-    });
+  document.body.appendChild(notification);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => notification.classList.add('show'));
+  });
+  setTimeout(() => {
+    notification.classList.remove('show');
+    setTimeout(() => notification.remove(), 300);
+  }, 5000);
+}
 
-    navLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            navMenu.classList.remove('active');
-            const icon = mobileToggle.querySelector('i');
-            icon.classList.add('fa-bars');
-            icon.classList.remove('fa-times');
+/* ============================================================
+   EMAILJS — loaded lazily on first contact form interaction
+   ============================================================ */
+let emailJSLoaded = false;
+let emailJSLoading = false;
+
+function loadEmailJS(cb) {
+  if (emailJSLoaded) { cb && cb(); return; }
+  if (emailJSLoading) { return; }
+  emailJSLoading = true;
+
+  const s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
+  s.onload = () => {
+    emailJSLoaded = true;
+    emailjs.init({ publicKey: '8swwpvfblWBcvJS-u' });
+    cb && cb();
+  };
+  s.onerror = () => { emailJSLoading = false; };
+  document.head.appendChild(s);
+}
+
+function initContactForm() {
+  const form = document.getElementById('contact-form');
+  if (!form) return;
+
+  const button       = form.querySelector("button[type='submit']");
+  const serviceID    = 'service_578o5c8';
+  const templateID   = 'template_u6qazit';
+  const originalHTML = button ? button.innerHTML : '';
+
+  // Lazy load EmailJS on first focus/input
+  const triggerLoad = () => {
+    loadEmailJS();
+    form.removeEventListener('focusin', triggerLoad);
+  };
+  form.addEventListener('focusin', triggerLoad, { once: true });
+
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    if (!button) return;
+
+    button.disabled = true;
+    button.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 512 512" style="animation:spin .8s linear infinite;fill:currentColor" aria-hidden="true"><path d="M304 48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zm0 416a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM48 304a48 48 0 1 0 0-96 48 48 0 1 0 0 96zm464-48a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zM142.9 437A48 48 0 1 0 75 369.1 48 48 0 1 0 142.9 437zm0-294.2A48 48 0 1 0 75 75a48 48 0 1 0 67.9 67.8zM369.1 437A48 48 0 1 0 437 369.1 48 48 0 1 0 369.1 437z"/></svg> Sending...';
+
+    const send = () => {
+      emailjs.sendForm(serviceID, templateID, form)
+        .then(() => {
+          button.innerHTML = 'Message Sent!';
+          showNotification("Message sent! I'll get back to you soon.", 'success');
+          setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.disabled  = false;
+            form.reset();
+          }, 3000);
+        })
+        .catch(err => {
+          console.error('EmailJS error:', err);
+          button.innerHTML = 'Failed to Send';
+          showNotification('Failed to send. Try again later.', 'error');
+          setTimeout(() => {
+            button.innerHTML = originalHTML;
+            button.disabled  = false;
+          }, 3000);
         });
-    });
+    };
 
-    window.addEventListener('scroll', () => {
-        navbar.classList.toggle('scrolled', window.scrollY > 100);
+    if (emailJSLoaded) { send(); }
+    else { loadEmailJS(send); }
+  });
+}
+
+/* ============================================================
+   NAVIGATION — scroll spy + mobile toggle
+   ============================================================ */
+function initNavigation() {
+  const navbar      = document.getElementById('navbar');
+  const navLinks    = document.querySelectorAll('.nav-link');
+  const mobileToggle = document.getElementById('mobile-toggle');
+  const navMenu     = document.getElementById('nav-menu');
+  const sections    = document.querySelectorAll('section[id]');
+
+  if (!mobileToggle || !navMenu) return;
+
+  // Mobile menu icons via JS (no FA dependency)
+  const BARS_SVG  = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg>';
+  const TIMES_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>';
+
+  mobileToggle.innerHTML = BARS_SVG;
+
+  mobileToggle.addEventListener('click', () => {
+    const isOpen = navMenu.classList.toggle('active');
+    mobileToggle.innerHTML = isOpen ? TIMES_SVG : BARS_SVG;
+    mobileToggle.setAttribute('aria-expanded', isOpen);
+  });
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      navMenu.classList.remove('active');
+      mobileToggle.innerHTML = BARS_SVG;
+      mobileToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // Batch scroll reads
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        // All reads
+        const scrollY = window.scrollY;
+        navbar.classList.toggle('scrolled', scrollY > 100);
 
         let current = '';
         sections.forEach(section => {
-            const sectionTop = section.offsetTop;
-            if (window.scrollY >= sectionTop - 200) {
-                current = section.getAttribute('id');
-            }
+          if (scrollY >= section.offsetTop - 200) {
+            current = section.getAttribute('id');
+          }
         });
 
+        // All writes
         navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href').substring(1) === current) {
-                link.classList.add('active');
-            }
+          const href = link.getAttribute('href');
+          if (href) {
+            link.classList.toggle('active', href.substring(1) === current);
+          }
         });
-    });
 
-    navLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const id = link.getAttribute('href').substring(1);
-            const target = document.getElementById(id);
-            if (target) {
-                const offsetTop = target.offsetTop - 80;
-                window.scrollTo({ top: offsetTop, behavior: 'smooth' });
-            }
-        });
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+
+  navLinks.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      const id     = link.getAttribute('href').substring(1);
+      const target = document.getElementById(id);
+      if (target) {
+        const offsetTop = target.offsetTop - 80;
+        window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+      }
     });
+  });
 }
 
-// === Parallax for Hero Section (ORIGINAL) ===
-window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset;
-    const hero = document.querySelector('.hero-content');
-    if (hero) {
-        hero.style.transform = `translateY(${scrolled * 0.3}px)`;
-    }
-});
-
-// === Certificate Card Stack (fanned deck) ===
-function initCertStack() {
-    const stack = document.getElementById('cert-stack');
-    if (!stack) return;
-
-    const wrapper = document.querySelector('.cert-stack-wrapper');
-    const cards = Array.from(stack.querySelectorAll('.cert-card'));
-    const counter = document.getElementById('cert-counter');
-    const dotsWrap = document.getElementById('cert-dots');
-    const prevBtn = document.getElementById('cert-prev');
-    const nextBtn = document.getElementById('cert-next');
-
-    const AUTOPLAY_DELAY = 2500; // ms between auto-swipes
-    let autoplayTimer = null;
-
-    // order[0] is always the front-most card's index
-    let order = cards.map((_, i) => i);
-
-    // Build nav dots (one per card)
-    cards.forEach((_, i) => {
-        const dot = document.createElement('span');
-        dot.className = 'cert-dot';
-        dot.setAttribute('role', 'button');
-        dot.setAttribute('aria-label', `Show certificate ${i + 1}`);
-        dot.addEventListener('click', () => {
-            bringToFront(i);
-            restartAutoplay();
-        });
-        dotsWrap.appendChild(dot);
-    });
-    const dots = Array.from(dotsWrap.children);
-
-    function render() {
-        order.forEach((cardIndex, pos) => {
-            const card = cards[cardIndex];
-            card.classList.remove('pos-0', 'pos-1', 'pos-2', 'pos-3', 'pos-4', 'pos-5');
-            card.classList.add(`pos-${pos}`);
-        });
-
-        const frontIndex = order[0];
-        if (counter) counter.textContent = `${frontIndex + 1} / ${cards.length}`;
-        dots.forEach((dot, i) => dot.classList.toggle('active', i === frontIndex));
-    }
-
-    function next() {
-        order.push(order.shift());
-        render();
-    }
-
-    function prev() {
-        order.unshift(order.pop());
-        render();
-    }
-
-    function bringToFront(cardIndex) {
-        const posInOrder = order.indexOf(cardIndex);
-        if (posInOrder <= 0) return;
-        order = order.slice(posInOrder).concat(order.slice(0, posInOrder));
-        render();
-    }
-
-    function startAutoplay() {
-        stopAutoplay();
-        autoplayTimer = setInterval(next, AUTOPLAY_DELAY);
-    }
-
-    function stopAutoplay() {
-        if (autoplayTimer) {
-            clearInterval(autoplayTimer);
-            autoplayTimer = null;
+/* ============================================================
+   HERO PARALLAX — deferred, no forced reflow
+   ============================================================ */
+function initParallax() {
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        const scrolled = window.pageYOffset;
+        const hero = document.querySelector('.hero-content');
+        if (hero) {
+          hero.style.transform = `translateY(${scrolled * 0.3}px)`;
         }
+        ticking = false;
+      });
+      ticking = true;
     }
-
-    function restartAutoplay() {
-        startAutoplay();
-    }
-
-    cards.forEach((card, cardIndex) => {
-        card.addEventListener('click', () => {
-            // Clicking a background card brings it to the front.
-            // The front card already shows its name, org, and image,
-            // so clicking it doesn't need to do anything extra.
-            if (order[0] !== cardIndex) {
-                bringToFront(cardIndex);
-                restartAutoplay();
-            }
-        });
-    });
-
-    // Arrow buttons are optional — guard against them not being in the markup
-    if (prevBtn) prevBtn.addEventListener('click', () => { prev(); restartAutoplay(); });
-    if (nextBtn) nextBtn.addEventListener('click', () => { next(); restartAutoplay(); });
-
-    // Pause auto-swipe while the user's mouse is over the stack
-    if (wrapper) {
-        wrapper.addEventListener('mouseenter', stopAutoplay);
-        wrapper.addEventListener('mouseleave', startAutoplay);
-    }
-
-    render();
-    startAutoplay();
+  }, { passive: true });
 }
 
-// === Master Initializer ===
+/* ============================================================
+   CERTIFICATE STACK
+   ============================================================ */
+function initCertStack() {
+  const stack   = document.getElementById('cert-stack');
+  if (!stack) return;
+
+  const wrapper  = document.querySelector('.cert-stack-wrapper');
+  const cards    = Array.from(stack.querySelectorAll('.cert-card'));
+  const counter  = document.getElementById('cert-counter');
+  const dotsWrap = document.getElementById('cert-dots');
+  const prevBtn  = document.getElementById('cert-prev');
+  const nextBtn  = document.getElementById('cert-next');
+
+  const AUTOPLAY_DELAY = 2500;
+  let autoplayTimer = null;
+  let order = cards.map((_, i) => i);
+
+  cards.forEach((_, i) => {
+    const dot = document.createElement('span');
+    dot.className = 'cert-dot';
+    dot.setAttribute('role', 'button');
+    dot.setAttribute('aria-label', `Show certificate ${i + 1}`);
+    dot.setAttribute('tabindex', '0');
+    dot.addEventListener('click', () => { bringToFront(i); restartAutoplay(); });
+    dot.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { bringToFront(i); restartAutoplay(); }
+    });
+    dotsWrap.appendChild(dot);
+  });
+  const dots = Array.from(dotsWrap.children);
+
+  function render() {
+    order.forEach((cardIndex, pos) => {
+      const card = cards[cardIndex];
+      card.classList.remove('pos-0', 'pos-1', 'pos-2', 'pos-3', 'pos-4', 'pos-5');
+      card.classList.add(`pos-${Math.min(pos, 5)}`);
+    });
+    const frontIndex = order[0];
+    if (counter) counter.textContent = `${frontIndex + 1} / ${cards.length}`;
+    dots.forEach((dot, i) => dot.classList.toggle('active', i === frontIndex));
+  }
+
+  function next()  { order.push(order.shift()); render(); }
+  function prev()  { order.unshift(order.pop()); render(); }
+
+  function bringToFront(cardIndex) {
+    const pos = order.indexOf(cardIndex);
+    if (pos <= 0) return;
+    order = order.slice(pos).concat(order.slice(0, pos));
+    render();
+  }
+
+  function startAutoplay() {
+    stopAutoplay();
+    autoplayTimer = setInterval(next, AUTOPLAY_DELAY);
+  }
+  function stopAutoplay() {
+    if (autoplayTimer) { clearInterval(autoplayTimer); autoplayTimer = null; }
+  }
+  function restartAutoplay() { startAutoplay(); }
+
+  cards.forEach((card, cardIndex) => {
+    card.addEventListener('click', () => {
+      if (order[0] !== cardIndex) { bringToFront(cardIndex); restartAutoplay(); }
+    });
+  });
+
+  if (prevBtn) prevBtn.addEventListener('click', () => { prev(); restartAutoplay(); });
+  if (nextBtn) nextBtn.addEventListener('click', () => { next(); restartAutoplay(); });
+
+  if (wrapper) {
+    wrapper.addEventListener('mouseenter', stopAutoplay);
+    wrapper.addEventListener('mouseleave', startAutoplay);
+  }
+
+  render();
+  startAutoplay();
+}
+
+/* ============================================================
+   PRELOADER — caps at 1.2s, never blocks hero h1
+   ============================================================ */
+function initPreloader() {
+  const loaderWrapper = document.getElementById('loader-wrapper');
+  if (!loaderWrapper) return;
+
+  function hideLoader() {
+    loaderWrapper.classList.add('hidden');
+    // Remove from DOM after fade completes
+    setTimeout(() => { loaderWrapper.remove(); }, 900);
+  }
+
+  // Hide after max 1.2s, or immediately when page is already loaded
+  if (document.readyState === 'complete') {
+    setTimeout(hideLoader, 300);
+  } else {
+    window.addEventListener('load', () => setTimeout(hideLoader, 1200), { once: true });
+    // Safety fallback
+    setTimeout(hideLoader, 3000);
+  }
+}
+
+/* ============================================================
+   MASTER INIT — DOMContentLoaded (deferred script)
+   ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
-    initCustomCursor();   // ★ new
-    initThemeToggle();    // ★ new
-    initThreeJS();
-    handleScrollAnimations();
-    initNavigation();
-    initProjectDrawer();  // ★ new
-    initEmailJS();
-    initCertStack();      // ★ new
+  // Critical UI init first
+  initPreloader();
+  initCustomCursor();
+  initThemeToggle();
+  initNavigation();
+  initTyping();
+  handleScrollAnimations();
+  initProjectDrawer();
+  initContactForm();
+  initCertStack();
+  initParallax();
+
+  // Three.js — after window load + idle, skip on mobile
+  window.addEventListener('load', () => {
+    const loadThree = () => {
+      if (window.innerWidth < 768 ||
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+      s.defer = true;
+      s.onload = initThreeJS;
+      document.head.appendChild(s);
+    };
+
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(loadThree, { timeout: 2000 });
+    } else {
+      setTimeout(loadThree, 500);
+    }
+  }, { once: true });
 });
+
+/* CSS for spinner animation (injected once) */
+const spinStyle = document.createElement('style');
+spinStyle.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(spinStyle);
