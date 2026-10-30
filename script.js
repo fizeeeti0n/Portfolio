@@ -501,19 +501,24 @@ function initContactForm() {
    NAVIGATION — scroll spy + mobile toggle
    ============================================================ */
 function initNavigation() {
-  const navbar      = document.getElementById('navbar');
-  const navLinks    = document.querySelectorAll('.nav-link');
+  const navbar       = document.getElementById('navbar');
+  const navLinks     = document.querySelectorAll('.nav-link');
   const mobileToggle = document.getElementById('mobile-toggle');
-  const navMenu     = document.getElementById('nav-menu');
-  const sections    = document.querySelectorAll('section[id]');
+  const navMenu      = document.getElementById('nav-menu');
+  const sections     = document.querySelectorAll('section[id]');
 
   if (!mobileToggle || !navMenu) return;
 
-  // Mobile menu icons via JS (no FA dependency)
   const BARS_SVG  = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 448 512" fill="currentColor" aria-hidden="true"><path d="M0 96C0 78.3 14.3 64 32 64H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32H416c17.7 0 32 14.3 32 32s-14.3 32-32 32H32c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32H32c-17.7 0-32-14.3-32-32s14.3-32 32-32H416c17.7 0 32 14.3 32 32z"/></svg>';
   const TIMES_SVG = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 384 512" fill="currentColor" aria-hidden="true"><path d="M342.6 150.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L192 210.7 86.6 105.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L146.7 256 41.4 361.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L192 301.3 297.4 406.6c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L237.3 256 342.6 150.6z"/></svg>';
 
   mobileToggle.innerHTML = BARS_SVG;
+
+  function closeMenu() {
+    navMenu.classList.remove('active');
+    mobileToggle.innerHTML = BARS_SVG;
+    mobileToggle.setAttribute('aria-expanded', 'false');
+  }
 
   mobileToggle.addEventListener('click', () => {
     const isOpen = navMenu.classList.toggle('active');
@@ -521,47 +526,59 @@ function initNavigation() {
     mobileToggle.setAttribute('aria-expanded', isOpen);
   });
 
-  navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
+  /* ---------- clean-URL routing ---------- */
+  const SECTION_IDS = Array.from(navLinks).map(l => l.dataset.section);
+
+  function goTo(name, smooth) {
+    const behavior = smooth ? 'smooth' : 'auto';
+    if (!name || name === 'home') {
+      window.scrollTo({ top: 0, behavior });
+      return;
+    }
+    const el = document.getElementById(name);
+    if (el) window.scrollTo({ top: el.offsetTop - 80, behavior });
+  }
+
+  function pathName() {
+    return location.pathname.replace(/^\/|\/$/g, '') || 'home';
+  }
+
+  // Nav links + logo (anything with data-section)
+  document.querySelectorAll('a[data-section]').forEach(link => {
+    link.addEventListener('click', e => {
       e.preventDefault();
-      const href = link.getAttribute('href');
-      const targetId = href && href.startsWith('#') ? href.slice(1) : href;
-      const targetEl = document.getElementById(targetId);
-      if (targetEl) {
-        targetEl.scrollIntoView({ behavior: 'smooth' });
-      }
-      if (targetId) {
-        const newPath = `/${targetId}`;
-        history.pushState(null, '', newPath);
-      }
-      navMenu.classList.remove('active');
-      mobileToggle.innerHTML = BARS_SVG;
-      mobileToggle.setAttribute('aria-expanded', 'false');
+      const name = link.dataset.section;
+      const path = name === 'home' ? '/' : '/' + name;
+      if (location.pathname !== path) history.pushState({ section: name }, '', path);
+      goTo(name, true);
+      closeMenu();
     });
   });
 
-  // Batch scroll reads
+  // Back / forward buttons
+  window.addEventListener('popstate', () => goTo(pathName(), true));
+
+  // Opening /about (etc.) directly
+  const initial = pathName();
+  if (SECTION_IDS.includes(initial)) {
+    window.addEventListener('load', () => setTimeout(() => goTo(initial, false), 100), { once: true });
+  }
+
+  /* ---------- scroll spy ---------- */
   let ticking = false;
   window.addEventListener('scroll', () => {
     if (!ticking) {
       requestAnimationFrame(() => {
-        // All reads
         const scrollY = window.scrollY;
         navbar.classList.toggle('scrolled', scrollY > 100);
 
         let current = '';
         sections.forEach(section => {
-          if (scrollY >= section.offsetTop - 200) {
-            current = section.getAttribute('id');
-          }
+          if (scrollY >= section.offsetTop - 200) current = section.getAttribute('id');
         });
 
-        // All writes
         navLinks.forEach(link => {
-          const href = link.getAttribute('href');
-          if (href) {
-            link.classList.toggle('active', href.substring(1) === current);
-          }
+          link.classList.toggle('active', link.dataset.section === current);
         });
 
         ticking = false;
@@ -569,18 +586,6 @@ function initNavigation() {
       ticking = true;
     }
   }, { passive: true });
-
-  navLinks.forEach(link => {
-    link.addEventListener('click', e => {
-      e.preventDefault();
-      const id     = link.getAttribute('href').substring(1);
-      const target = document.getElementById(id);
-      if (target) {
-        const offsetTop = target.offsetTop - 80;
-        window.scrollTo({ top: offsetTop, behavior: 'smooth' });
-      }
-    });
-  });
 }
 
 /* ============================================================
@@ -747,3 +752,4 @@ document.addEventListener('DOMContentLoaded', () => {
 const spinStyle = document.createElement('style');
 spinStyle.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
 document.head.appendChild(spinStyle);
+
