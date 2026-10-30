@@ -1,4 +1,12 @@
 {
+  "redirects": [
+    { "source": "/about",        "destination": "/#about",        "permanent": false },
+    { "source": "/skills",       "destination": "/#skills",       "permanent": false },
+    { "source": "/projects",     "destination": "/#projects",     "permanent": false },
+    { "source": "/experience",   "destination": "/#experience",   "permanent": false },
+    { "source": "/certificates", "destination": "/#certificates", "permanent": false },
+    { "source": "/contact",      "destination": "/#contact",      "permanent": false }
+  ],
   "headers": [
     {
       "source": "/(.*)",
