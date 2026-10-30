@@ -5,42 +5,42 @@ const PROJECTS = [
   {
     title: "Wish Calculator",
     description: "A fully customizable calculator where you can change the look based on your wish.",
-    image: "./photo/Cal.webp",
+    image: "/photo/Cal.webp",
     link: "https://calculator-beta-beige-74.vercel.app/",
     categories: ["web", "tools"]
   },
   {
     title: "TedX Clone",
     description: "This is a clone of the TedX program website, demonstrating proficiency in modern web layouts.",
-    image: "./photo/tedX.webp",
+    image: "/photo/tedX.webp",
     link: "https://ted-x-puce.vercel.app/",
     categories: ["web"]
   },
   {
     title: "UniStudy AI",
     description: "An AI-powered tool designed to assist students by streamlining their study process and research.",
-    image: "./photo/UniAI.webp",
+    image: "/photo/UniAI.webp",
     link: "https://uni-ai-2q9g.onrender.com/",
     categories: ["ai", "web"]
   },
   {
     title: "SmartAid",
     description: "A Django web application powered by Gemini AI. Helps students excel academically while supporting mental wellbeing through dynamic, responsive features.",
-    image: "./photo/SmartAid.webp",
+    image: "/photo/SmartAid.webp",
     link: "https://github.com/fizeeeti0n/SmartAid",
     categories: ["ai", "web"]
   },
   {
     title: "ApexApply AI",
     description: "Smart Job Application Strategist powered by Google Gemini. Cover Letter Generator, ATS & Fit Analysis, and CV Optimization using advanced NLP.",
-    image: "./photo/ApexApply AI.webp",
+    image: "/photo/ApexApply AI.webp",
     link: "https://apex-apply-ai.vercel.app/",
     categories: ["ai"]
   },
   {
     title: "UAP CSE Iftar",
     description: "Official website for the UAP Department of CSE Ramadan Iftar Mahfil event — event details, RSVP, and community announcements.",
-    image: "./photo/Uap CSE Iftar.webp",
+    image: "/photo/Uap CSE Iftar.webp",
     link: "https://uapcse-iftar.vercel.app",
     categories: ["web"]
   },
@@ -69,49 +69,72 @@ const CATEGORY_LABELS = {
 };
 
 /* ============================================================
-   MOUSE POSITION — shared with Three.js repulsion
+   SHARED STATE
    ============================================================ */
 const mouse3D = { x: 0, y: 0, active: false };
+const fx = {
+  drawerOpen: false,   // heavy effects pause while true
+  scrollY: 0,          // updated by the single scroll handler
+  pause: null,         // set by Three.js init
+  resume: null
+};
+
+const IS_TOUCH   = window.matchMedia('(pointer: coarse)').matches;
+const REDUCED    = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const LOW_END    = (navigator.hardwareConcurrency || 8) <= 4 ||
+                   (navigator.deviceMemory || 8) <= 4 ||
+                   (navigator.connection && navigator.connection.saveData);
 
 /* ============================================================
-   CUSTOM CURSOR
+   CUSTOM CURSOR — GPU transform, loop sleeps when idle
+   Uses the individual `translate` property so your existing CSS
+   `transform` (centering / hover scale) keeps working.
    ============================================================ */
 function initCustomCursor() {
   const dot  = document.getElementById('cursor-dot');
   const ring = document.getElementById('cursor-ring');
-  if (!dot || !ring) return;
+  if (!dot || !ring || IS_TOUCH) return;
 
-  let mouseX = 0, mouseY = 0;
-  let ringX  = 0, ringY  = 0;
+  dot.style.left = dot.style.top = '0px';
+  ring.style.left = ring.style.top = '0px';
+
+  let mouseX = 0, mouseY = 0, ringX = 0, ringY = 0;
+  let running = false;
+
+  function loop() {
+    ringX += (mouseX - ringX) * 0.18;
+    ringY += (mouseY - ringY) * 0.18;
+    ring.style.translate = ringX + 'px ' + ringY + 'px';
+
+    if (Math.abs(mouseX - ringX) < 0.1 && Math.abs(mouseY - ringY) < 0.1) {
+      running = false;       // settled: stop burning frames
+      return;
+    }
+    requestAnimationFrame(loop);
+  }
 
   document.addEventListener('mousemove', e => {
     mouseX = e.clientX;
     mouseY = e.clientY;
-
-    dot.style.left = mouseX + 'px';
-    dot.style.top  = mouseY + 'px';
+    dot.style.translate = mouseX + 'px ' + mouseY + 'px';
 
     mouse3D.x      =  (mouseX / window.innerWidth)  * 2 - 1;
     mouse3D.y      = -(mouseY / window.innerHeight) * 2 + 1;
     mouse3D.active = true;
+
+    if (!running) { running = true; requestAnimationFrame(loop); }
   }, { passive: true });
 
   document.addEventListener('mouseleave', () => { mouse3D.active = false; });
 
-  (function animateRing() {
-    ringX += (mouseX - ringX) * 0.10;
-    ringY += (mouseY - ringY) * 0.10;
-    ring.style.left = ringX + 'px';
-    ring.style.top  = ringY + 'px';
-    requestAnimationFrame(animateRing);
-  })();
-
   const hoverSel = 'a,button,input,textarea,.skill-card,.category-btn,.drawer-project-card,.cta-button,.submit-btn,.project-link,.proj-link,.cert-dot,.cert-card';
+  let hovering = false;
   document.addEventListener('mouseover', e => {
-    if (e.target.closest(hoverSel)) document.body.classList.add('cursor-hover');
-  }, { passive: true });
-  document.addEventListener('mouseout', e => {
-    if (e.target.closest(hoverSel)) document.body.classList.remove('cursor-hover');
+    const hit = !!e.target.closest(hoverSel);
+    if (hit !== hovering) {
+      hovering = hit;
+      document.body.classList.toggle('cursor-hover', hit);
+    }
   }, { passive: true });
 }
 
@@ -122,19 +145,26 @@ function initThemeToggle() {
   const btn = document.getElementById('theme-toggle');
   if (!btn) return;
 
-  if (localStorage.getItem('portfolio-theme') === 'light') {
-    document.body.classList.add('light-mode');
-  }
+  try {
+    if (localStorage.getItem('portfolio-theme') === 'light') {
+      document.body.classList.add('light-mode');
+    }
+  } catch (_) {}
 
   btn.addEventListener('click', () => {
     document.body.classList.toggle('light-mode');
-    localStorage.setItem('portfolio-theme',
-      document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    try {
+      localStorage.setItem('portfolio-theme',
+        document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    } catch (_) {}
   });
 }
 
 /* ============================================================
    PROJECT CATEGORY DRAWER
+   - background effects pause while open
+   - rendered HTML cached per category
+   - open/close work deferred to next frame
    ============================================================ */
 function initProjectDrawer() {
   const drawer   = document.getElementById('project-drawer');
@@ -147,39 +177,50 @@ function initProjectDrawer() {
 
   if (!drawer || !backdrop) return;
 
+  const LINK_ICON = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="14" height="14" style="vertical-align:-2px;margin-right:4px;fill:currentColor" aria-hidden="true"><path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3l0 82.7c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 32C35.8 32 0 67.8 0 112L0 432c0 44.2 35.8 80 80 80l320 0c44.2 0 80-35.8 80-80l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-320c0-8.8 7.2-16 16-16l112 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 32z"/></svg>';
+
+  const htmlCache = {};
+
   function renderCard(p) {
-    return `
-      <div class="drawer-project-card">
-        <div class="proj-img">
-          <img src="${p.image}" alt="${p.title}" loading="lazy" decoding="async"
-               onerror="this.parentElement.style.display='none'">
-        </div>
-        <div class="proj-content">
-          <h3 class="proj-title">${p.title}</h3>
-          <p class="proj-desc">${p.description}</p>
-          <a href="${p.link}" class="proj-link" target="_blank" rel="noopener noreferrer">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="14" height="14" style="vertical-align:-2px;margin-right:4px;fill:currentColor" aria-hidden="true"><path d="M320 0c-17.7 0-32 14.3-32 32s14.3 32 32 32l82.7 0L201.4 265.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0L448 109.3l0 82.7c0 17.7 14.3 32 32 32s32-14.3 32-32l0-160c0-17.7-14.3-32-32-32L320 0zM80 32C35.8 32 0 67.8 0 112L0 432c0 44.2 35.8 80 80 80l320 0c44.2 0 80-35.8 80-80l0-112c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 112c0 8.8-7.2 16-16 16L80 448c-8.8 0-16-7.2-16-16l0-320c0-8.8 7.2-16 16-16l112 0c17.7 0 32-14.3 32-32s-14.3-32-32-32L80 32z"/></svg>
-            View Project
-          </a>
-        </div>
-      </div>`;
+    return '<div class="drawer-project-card">' +
+      '<div class="proj-img"><img src="' + p.image + '" alt="' + p.title + '" loading="lazy" decoding="async" ' +
+      'onerror="this.parentElement.style.display=\'none\'"></div>' +
+      '<div class="proj-content">' +
+      '<h3 class="proj-title">' + p.title + '</h3>' +
+      '<p class="proj-desc">' + p.description + '</p>' +
+      '<a href="' + p.link + '" class="proj-link" target="_blank" rel="noopener noreferrer">' +
+      LINK_ICON + 'View Project</a></div></div>';
   }
 
-  function openDrawer(category) {
+  function buildHTML(category) {
+    if (htmlCache[category]) return htmlCache[category];
     const filtered = category === 'all'
       ? PROJECTS
       : PROJECTS.filter(p => p.categories.includes(category));
+    const html = filtered.length
+      ? '<div class="drawer-projects-grid">' + filtered.map(renderCard).join('') + '</div>'
+      : '<div class="drawer-empty"><p>No projects here yet.</p></div>';
+    htmlCache[category] = { html, count: filtered.length };
+    return htmlCache[category];
+  }
+
+  function openDrawer(category) {
+    const { html, count } = buildHTML(category);
+
+    // pause heavy background work BEFORE the animation starts
+    fx.drawerOpen = true;
+    if (fx.pause) fx.pause();
 
     titleEl.textContent = CATEGORY_LABELS[category] || 'Projects';
-    countEl.textContent = `${filtered.length} project${filtered.length !== 1 ? 's' : ''}`;
+    countEl.textContent = count + ' project' + (count !== 1 ? 's' : '');
+    bodyEl.innerHTML = html;
+    bodyEl.scrollTop = 0;
 
-    bodyEl.innerHTML = filtered.length
-      ? `<div class="drawer-projects-grid">${filtered.map(renderCard).join('')}</div>`
-      : `<div class="drawer-empty"><p>No projects here yet.</p></div>`;
-
-    drawer.classList.add('open');
-    backdrop.classList.add('visible');
-    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => {
+      drawer.classList.add('open');
+      backdrop.classList.add('visible');
+      document.body.style.overflow = 'hidden';
+    });
   }
 
   function closeDrawer() {
@@ -187,6 +228,9 @@ function initProjectDrawer() {
     backdrop.classList.remove('visible');
     document.body.style.overflow = '';
     catBtns.forEach(b => b.classList.remove('active'));
+    fx.drawerOpen = false;
+    // resume after the slide-out finishes so it stays smooth
+    setTimeout(() => { if (!fx.drawerOpen && fx.resume) fx.resume(); }, 400);
   }
 
   catBtns.forEach(btn => {
@@ -205,166 +249,168 @@ function initProjectDrawer() {
 }
 
 /* ============================================================
-   THREE.JS — loaded lazily after window load
-   Skip on mobile (<768px) and prefers-reduced-motion
+   THREE.JS PARTICLES — lazy, lightweight, pausable
+   - fewer particles, zero per-frame allocations
+   - physics only runs while mouse is near / particles are settling
+   - pauses when tab hidden or drawer open
    ============================================================ */
 function initThreeJS() {
-  if (window.innerWidth < 768) return;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if (typeof THREE === 'undefined') return;
+  if (window.innerWidth < 768 || REDUCED || typeof THREE === 'undefined') return;
 
-  const canvas   = document.getElementById('global-canvas');
+  const canvas = document.getElementById('global-canvas');
+  if (!canvas) return;
+
   const scene    = new THREE.Scene();
   const camera   = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, powerPreference: 'low-power' });
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false, powerPreference: 'low-power' });
 
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.setClearColor(0x000000, 0);
   camera.position.z = 1000;
 
-  const particleSystems = [];
+  const scale = LOW_END ? 0.5 : 1;
+  const systems = [];
 
   function createParticles(count, range, size, opacity, speed) {
+    count = Math.round(count * scale);
     const positions = new Float32Array(count * 3);
-    for (let i = 0; i < count * 3; i++) {
-      positions[i] = (Math.random() - 0.5) * range;
-    }
+    for (let i = 0; i < count * 3; i++) positions[i] = (Math.random() - 0.5) * range;
     const home = positions.slice();
     const vel  = new Float32Array(count * 3);
 
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
     const material = new THREE.PointsMaterial({ color: 0x00f5ff, size, transparent: true, opacity });
     const points   = new THREE.Points(geometry, material);
     scene.add(points);
-    particleSystems.push({ points, speed, positions, home, vel, count });
+    systems.push({ points, speed, positions, home, vel, count, attr: geometry.attributes.position });
   }
 
-  createParticles(1500, 3000, 1,   0.3, { x: 0.0005, y: 0.001  });
-  createParticles(800,  2000, 2.5, 0.6, { x: 0.001,  y: 0.0015 });
-  createParticles(400,  2500, 1.8, 0.4, { x: 0.0008, y: 0.0012 });
+  createParticles(600, 3000, 1,   0.3, { x: 0.0005, y: 0.001  });
+  createParticles(300, 2000, 2.5, 0.6, { x: 0.001,  y: 0.0015 });
+  createParticles(150, 2500, 1.8, 0.4, { x: 0.0008, y: 0.0012 });
 
   const mouseWorld = new THREE.Vector3();
+  const localMouse = new THREE.Vector3();
+  const inv        = new THREE.Matrix4();
   const raycaster  = new THREE.Raycaster();
   const mouseNDC   = new THREE.Vector2();
 
-  const REPEL_R   = 200;
-  const REPEL_STR = 600;
-  const RETURN    = 0.045;
-  const DAMP      = 0.80;
+  const REPEL_R = 200, REPEL_STR = 600, RETURN = 0.045, DAMP = 0.80;
+  let settleFrames = 0;
+  let rafId = null;
 
   function animate() {
-    requestAnimationFrame(animate);
+    rafId = requestAnimationFrame(animate);
     const time = Date.now() * 0.0005;
 
+    const physics = mouse3D.active || settleFrames > 0;
     if (mouse3D.active) {
+      settleFrames = 90;
       mouseNDC.set(mouse3D.x, mouse3D.y);
       raycaster.setFromCamera(mouseNDC, camera);
       const t = -raycaster.ray.origin.z / raycaster.ray.direction.z;
       mouseWorld.copy(raycaster.ray.origin).addScaledVector(raycaster.ray.direction, t);
+    } else if (settleFrames > 0) {
+      settleFrames--;
     }
 
-    particleSystems.forEach((sys, index) => {
-      sys.points.rotation.x += sys.speed.x;
-      sys.points.rotation.y += sys.speed.y;
-      sys.points.position.y  = Math.sin(time + index) * 10;
-      sys.points.position.x  = Math.cos(time + index * 0.5) * 5;
+    for (let s = 0; s < systems.length; s++) {
+      const sys = systems[s];
+      const pts = sys.points;
 
-      const inv        = new THREE.Matrix4().copy(sys.points.matrixWorld).invert();
-      const localMouse = mouseWorld.clone().applyMatrix4(inv);
-      const pos        = sys.positions;
-      const vel        = sys.vel;
-      const home       = sys.home;
+      pts.rotation.x += sys.speed.x;
+      pts.rotation.y += sys.speed.y;
+      pts.rotation.z  = fx.scrollY * 0.0005 * (s + 1) * 0.1;
+      pts.position.y  = Math.sin(time + s) * 10;
+      pts.position.x  = Math.cos(time + s * 0.5) * 5;
 
-      for (let i = 0; i < sys.count; i++) {
-        const ix = i * 3, iy = ix + 1, iz = ix + 2;
+      if (!physics) continue;
+
+      pts.updateMatrixWorld();
+      inv.copy(pts.matrixWorld).invert();
+      localMouse.copy(mouseWorld).applyMatrix4(inv);
+
+      const pos = sys.positions, vel = sys.vel, home = sys.home, n = sys.count;
+      const mx = localMouse.x, my = localMouse.y, active = mouse3D.active;
+
+      for (let i = 0; i < n; i++) {
+        const ix = i * 3, iy = ix + 1;
         const cx = pos[ix], cy = pos[iy];
 
-        if (mouse3D.active) {
-          const dx   = cx - localMouse.x;
-          const dy   = cy - localMouse.y;
-          const dist = Math.sqrt(dx * dx + dy * dy) || 0.001;
-          if (dist < REPEL_R) {
+        if (active) {
+          const dx = cx - mx, dy = cy - my;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < REPEL_R * REPEL_R) {
+            const dist = Math.sqrt(d2) || 0.001;
             const f = (REPEL_R - dist) / REPEL_R;
-            vel[ix] += (dx / dist) * f * f * REPEL_STR * 0.016;
-            vel[iy] += (dy / dist) * f * f * REPEL_STR * 0.016;
+            const k = f * f * REPEL_STR * 0.016 / dist;
+            vel[ix] += dx * k;
+            vel[iy] += dy * k;
           }
         }
 
-        vel[ix] += (home[ix] - cx) * RETURN;
-        vel[iy] += (home[iy] - cy) * RETURN;
-        vel[ix] *= DAMP;
-        vel[iy] *= DAMP;
-        pos[ix]  += vel[ix];
-        pos[iy]  += vel[iy];
-        pos[iz]   = home[iz];
+        vel[ix] = (vel[ix] + (home[ix] - cx) * RETURN) * DAMP;
+        vel[iy] = (vel[iy] + (home[iy] - cy) * RETURN) * DAMP;
+        pos[ix] = cx + vel[ix];
+        pos[iy] = cy + vel[iy];
       }
-
-      sys.points.geometry.attributes.position.needsUpdate = true;
-    });
+      sys.attr.needsUpdate = true;
+    }
 
     renderer.render(scene, camera);
   }
 
-  animate();
+  function pause()  { if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
+  function resume() { if (!rafId && !fx.drawerOpen && !document.hidden) animate(); }
 
+  fx.pause  = pause;
+  fx.resume = resume;
+
+  document.addEventListener('visibilitychange', () => document.hidden ? pause() : resume());
+
+  let resizeT;
   window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    clearTimeout(resizeT);
+    resizeT = setTimeout(() => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    }, 150);
   }, { passive: true });
 
-  window.addEventListener('scroll', () => {
-    const scrolled = window.pageYOffset * 0.0005;
-    particleSystems.forEach((sys, i) => {
-      sys.points.rotation.z = scrolled * (i + 1) * 0.1;
-    });
-  }, { passive: true });
+  animate();
 }
 
 /* ============================================================
-   TYPING EFFECT — runs independently from Three.js
+   TYPING EFFECT
    ============================================================ */
 function initTyping() {
-  const textElement = document.getElementById('typing-text');
-  if (!textElement) return;
+  const el = document.getElementById('typing-text');
+  if (!el) return;
 
-  const texts = [
-    'Creative Frontend Developer',
-    'AI Enthusiast',
-    'AI Automation',
-    'N8n Specialist'
-  ];
+  const texts = ['Creative Frontend Developer', 'AI Enthusiast', 'AI Automation', 'N8n Specialist'];
+  const typingSpeed = 80, deletingSpeed = 50, pauseAfterTyping = 1200;
 
-  const typingSpeed  = 80;
-  const deletingSpeed = 50;
-  const pauseAfterTyping = 1200;
-
-  let textIndex  = 0;
-  let charIndex  = 0;
-  let isDeleting = false;
+  let textIndex = 0, charIndex = 0, isDeleting = false;
 
   function typeLoop() {
-    const currentText = texts[textIndex];
+    const current = texts[textIndex];
 
     if (!isDeleting) {
-      textElement.textContent = currentText.slice(0, charIndex + 1);
-      charIndex++;
-      if (charIndex === currentText.length) {
+      el.textContent = current.slice(0, ++charIndex);
+      if (charIndex === current.length) {
         setTimeout(() => { isDeleting = true; typeLoop(); }, pauseAfterTyping);
         return;
       }
     } else {
-      textElement.textContent = currentText.slice(0, charIndex - 1);
-      charIndex--;
+      el.textContent = current.slice(0, --charIndex);
       if (charIndex === 0) {
         isDeleting = false;
-        textIndex  = (textIndex + 1) % texts.length;
+        textIndex = (textIndex + 1) % texts.length;
       }
     }
-
     setTimeout(typeLoop, isDeleting ? deletingSpeed : typingSpeed);
   }
 
@@ -372,31 +418,26 @@ function initTyping() {
 }
 
 /* ============================================================
-   SCROLL ANIMATIONS — IntersectionObserver, opacity+transform
+   SCROLL ANIMATIONS — observe once, then stop observing
    ============================================================ */
 function handleScrollAnimations() {
-  // Batch: collect all reads first, then write
-  const observer = new IntersectionObserver((entries) => {
-    // All DOM reads happen inside callback (already batched by browser)
+  const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
+      if (!entry.isIntersecting) return;
+      const target = entry.target;
+      target.classList.add('is-visible');
+      observer.unobserve(target);
 
-        if (entry.target.id === 'skills') {
-          const bars = entry.target.querySelectorAll('.skill-progress-bar');
-          // Schedule writes after all reads done
-          requestAnimationFrame(() => {
-            bars.forEach(bar => {
-              if (!bar.classList.contains('filled')) {
-                const width = bar.getAttribute('data-width');
-                setTimeout(() => {
-                  bar.style.width = width;
-                  bar.classList.add('filled');
-                }, 500);
-              }
-            });
+      if (target.id === 'skills') {
+        const bars = target.querySelectorAll('.skill-progress-bar');
+        setTimeout(() => {
+          bars.forEach(bar => {
+            if (!bar.classList.contains('filled')) {
+              bar.style.width = bar.getAttribute('data-width');
+              bar.classList.add('filled');
+            }
           });
-        }
+        }, 500);
       }
     });
   }, { threshold: 0.1 });
@@ -408,32 +449,32 @@ function handleScrollAnimations() {
    NOTIFICATION TOAST
    ============================================================ */
 function showNotification(message, type) {
-  const notification = document.createElement('div');
-  notification.className = `notification ${type}`;
+  const n = document.createElement('div');
+  n.className = 'notification ' + type;
   const icon = type === 'success'
     ? '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 512 512" style="fill:currentColor" aria-hidden="true"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM369 209L241 337c-9.4 9.4-24.6 9.4-33.9 0l-64-64c-9.4-9.4-9.4-24.6 0-33.9s24.6-9.4 33.9 0l47 47L335 175c9.4-9.4 24.6-9.4 33.9 0s9.4 24.6 0 33.9z"/></svg>'
     : '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 512 512" style="fill:currentColor" aria-hidden="true"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zm-32 224a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>';
-  notification.innerHTML = `${icon}<span>${message}</span>`;
+  n.innerHTML = icon + '<span>' + message + '</span>';
 
-  document.body.appendChild(notification);
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => notification.classList.add('show'));
-  });
+  document.body.appendChild(n);
+  requestAnimationFrame(() => requestAnimationFrame(() => n.classList.add('show')));
   setTimeout(() => {
-    notification.classList.remove('show');
-    setTimeout(() => notification.remove(), 300);
+    n.classList.remove('show');
+    setTimeout(() => n.remove(), 300);
   }, 5000);
 }
 
 /* ============================================================
-   EMAILJS — loaded lazily on first contact form interaction
+   EMAILJS — lazy loaded on first form interaction
    ============================================================ */
 let emailJSLoaded = false;
 let emailJSLoading = false;
+const emailJSQueue = [];
 
 function loadEmailJS(cb) {
   if (emailJSLoaded) { cb && cb(); return; }
-  if (emailJSLoading) { return; }
+  if (cb) emailJSQueue.push(cb);
+  if (emailJSLoading) return;
   emailJSLoading = true;
 
   const s = document.createElement('script');
@@ -441,7 +482,7 @@ function loadEmailJS(cb) {
   s.onload = () => {
     emailJSLoaded = true;
     emailjs.init({ publicKey: '8swwpvfblWBcvJS-u' });
-    cb && cb();
+    emailJSQueue.splice(0).forEach(fn => fn());
   };
   s.onerror = () => { emailJSLoading = false; };
   document.head.appendChild(s);
@@ -456,14 +497,9 @@ function initContactForm() {
   const templateID   = 'template_u6qazit';
   const originalHTML = button ? button.innerHTML : '';
 
-  // Lazy load EmailJS on first focus/input
-  const triggerLoad = () => {
-    loadEmailJS();
-    form.removeEventListener('focusin', triggerLoad);
-  };
-  form.addEventListener('focusin', triggerLoad, { once: true });
+  form.addEventListener('focusin', () => loadEmailJS(), { once: true });
 
-  form.addEventListener('submit', function(e) {
+  form.addEventListener('submit', e => {
     e.preventDefault();
     if (!button) return;
 
@@ -477,7 +513,7 @@ function initContactForm() {
           showNotification("Message sent! I'll get back to you soon.", 'success');
           setTimeout(() => {
             button.innerHTML = originalHTML;
-            button.disabled  = false;
+            button.disabled = false;
             form.reset();
           }, 3000);
         })
@@ -487,25 +523,29 @@ function initContactForm() {
           showNotification('Failed to send. Try again later.', 'error');
           setTimeout(() => {
             button.innerHTML = originalHTML;
-            button.disabled  = false;
+            button.disabled = false;
           }, 3000);
         });
     };
 
-    if (emailJSLoaded) { send(); }
-    else { loadEmailJS(send); }
+    loadEmailJS(send);
   });
 }
 
 /* ============================================================
-   NAVIGATION — scroll spy + mobile toggle
+   NAVIGATION + SINGLE SCROLL HANDLER
+   - clean URLs (/about, /skills ...) via history.pushState
+   - one rAF-throttled scroll listener for navbar, scroll spy,
+     hero parallax and particle rotation
+   - section offsets cached (no layout reads while scrolling)
    ============================================================ */
 function initNavigation() {
   const navbar       = document.getElementById('navbar');
-  const navLinks     = document.querySelectorAll('.nav-link');
+  const navLinks     = Array.from(document.querySelectorAll('.nav-link'));
   const mobileToggle = document.getElementById('mobile-toggle');
   const navMenu      = document.getElementById('nav-menu');
-  const sections     = document.querySelectorAll('section[id]');
+  const sections     = Array.from(document.querySelectorAll('section[id]'));
+  const hero         = document.querySelector('.hero-content');
 
   if (!mobileToggle || !navMenu) return;
 
@@ -526,8 +566,17 @@ function initNavigation() {
     mobileToggle.setAttribute('aria-expanded', isOpen);
   });
 
+  /* ---------- cached geometry ---------- */
+  let offsets = [];
+  let vh = window.innerHeight;
+
+  function measure() {
+    vh = window.innerHeight;
+    offsets = sections.map(s => ({ id: s.id, top: s.offsetTop }));
+  }
+
   /* ---------- clean-URL routing ---------- */
-  const SECTION_IDS = Array.from(navLinks).map(l => l.dataset.section);
+  const SECTION_IDS = navLinks.map(l => l.dataset.section);
 
   function goTo(name, smooth) {
     const behavior = smooth ? 'smooth' : 'auto';
@@ -543,7 +592,6 @@ function initNavigation() {
     return location.pathname.replace(/^\/|\/$/g, '') || 'home';
   }
 
-  // Nav links + logo (anything with data-section)
   document.querySelectorAll('a[data-section]').forEach(link => {
     link.addEventListener('click', e => {
       e.preventDefault();
@@ -555,64 +603,78 @@ function initNavigation() {
     });
   });
 
-  // Back / forward buttons
   window.addEventListener('popstate', () => goTo(pathName(), true));
 
-  // Opening /about (etc.) directly
   const initial = pathName();
-  if (SECTION_IDS.includes(initial)) {
-    window.addEventListener('load', () => setTimeout(() => goTo(initial, false), 100), { once: true });
+  window.addEventListener('load', () => {
+    measure();
+    if (SECTION_IDS.includes(initial)) setTimeout(() => goTo(initial, false), 100);
+    onScroll();
+  }, { once: true });
+
+  /* ---------- single scroll handler ---------- */
+  let ticking = false;
+  let scrolledState = false;
+  let currentId = '';
+  let lastTransform = '';
+
+  function update() {
+    ticking = false;
+    const y = window.scrollY;
+    fx.scrollY = y;
+
+    const isScrolled = y > 100;
+    if (isScrolled !== scrolledState) {
+      scrolledState = isScrolled;
+      navbar.classList.toggle('scrolled', isScrolled);
+    }
+
+    // scroll spy
+    let current = '';
+    for (let i = 0; i < offsets.length; i++) {
+      if (y >= offsets[i].top - 200) current = offsets[i].id;
+    }
+    if (current !== currentId) {
+      currentId = current;
+      for (let i = 0; i < navLinks.length; i++) {
+        navLinks[i].classList.toggle('active', navLinks[i].dataset.section === current);
+      }
+    }
+
+    // hero parallax (only while hero is on screen)
+    if (hero && !REDUCED) {
+      const t = y < vh * 1.2 ? 'translate3d(0,' + (y * 0.3).toFixed(1) + 'px,0)' : '';
+      if (t !== lastTransform) {
+        hero.style.transform = t;
+        lastTransform = t;
+      }
+    }
   }
 
-  /* ---------- scroll spy ---------- */
-  let ticking = false;
-  window.addEventListener('scroll', () => {
+  function onScroll() {
     if (!ticking) {
-      requestAnimationFrame(() => {
-        const scrollY = window.scrollY;
-        navbar.classList.toggle('scrolled', scrollY > 100);
-
-        let current = '';
-        sections.forEach(section => {
-          if (scrollY >= section.offsetTop - 200) current = section.getAttribute('id');
-        });
-
-        navLinks.forEach(link => {
-          link.classList.toggle('active', link.dataset.section === current);
-        });
-
-        ticking = false;
-      });
       ticking = true;
+      requestAnimationFrame(update);
     }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  let resizeT;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeT);
+    resizeT = setTimeout(() => { measure(); onScroll(); }, 150);
   }, { passive: true });
+
+  measure();
+  update();
 }
 
 /* ============================================================
-   HERO PARALLAX — deferred, no forced reflow
-   ============================================================ */
-function initParallax() {
-  let ticking = false;
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      requestAnimationFrame(() => {
-        const scrolled = window.pageYOffset;
-        const hero = document.querySelector('.hero-content');
-        if (hero) {
-          hero.style.transform = `translateY(${scrolled * 0.3}px)`;
-        }
-        ticking = false;
-      });
-      ticking = true;
-    }
-  }, { passive: true });
-}
-
-/* ============================================================
-   CERTIFICATE STACK
+   CERTIFICATE STACK — autoplay only while visible & not hovered
    ============================================================ */
 function initCertStack() {
-  const stack   = document.getElementById('cert-stack');
+  const stack = document.getElementById('cert-stack');
   if (!stack) return;
 
   const wrapper  = document.querySelector('.cert-stack-wrapper');
@@ -625,34 +687,37 @@ function initCertStack() {
   const AUTOPLAY_DELAY = 2500;
   let autoplayTimer = null;
   let order = cards.map((_, i) => i);
+  let visible = false, hovering = false;
 
+  const frag = document.createDocumentFragment();
   cards.forEach((_, i) => {
     const dot = document.createElement('span');
     dot.className = 'cert-dot';
     dot.setAttribute('role', 'button');
-    dot.setAttribute('aria-label', `Show certificate ${i + 1}`);
+    dot.setAttribute('aria-label', 'Show certificate ' + (i + 1));
     dot.setAttribute('tabindex', '0');
-    dot.addEventListener('click', () => { bringToFront(i); restartAutoplay(); });
+    dot.addEventListener('click', () => { bringToFront(i); syncAutoplay(true); });
     dot.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { bringToFront(i); restartAutoplay(); }
+      if (e.key === 'Enter' || e.key === ' ') { bringToFront(i); syncAutoplay(true); }
     });
-    dotsWrap.appendChild(dot);
+    frag.appendChild(dot);
   });
+  dotsWrap.appendChild(frag);
   const dots = Array.from(dotsWrap.children);
 
   function render() {
     order.forEach((cardIndex, pos) => {
       const card = cards[cardIndex];
       card.classList.remove('pos-0', 'pos-1', 'pos-2', 'pos-3', 'pos-4', 'pos-5');
-      card.classList.add(`pos-${Math.min(pos, 5)}`);
+      card.classList.add('pos-' + Math.min(pos, 5));
     });
-    const frontIndex = order[0];
-    if (counter) counter.textContent = `${frontIndex + 1} / ${cards.length}`;
-    dots.forEach((dot, i) => dot.classList.toggle('active', i === frontIndex));
+    const front = order[0];
+    if (counter) counter.textContent = (front + 1) + ' / ' + cards.length;
+    dots.forEach((dot, i) => dot.classList.toggle('active', i === front));
   }
 
-  function next()  { order.push(order.shift()); render(); }
-  function prev()  { order.unshift(order.pop()); render(); }
+  function next() { order.push(order.shift()); render(); }
+  function prev() { order.unshift(order.pop()); render(); }
 
   function bringToFront(cardIndex) {
     const pos = order.indexOf(cardIndex);
@@ -661,61 +726,68 @@ function initCertStack() {
     render();
   }
 
-  function startAutoplay() {
-    stopAutoplay();
-    autoplayTimer = setInterval(next, AUTOPLAY_DELAY);
-  }
   function stopAutoplay() {
     if (autoplayTimer) { clearInterval(autoplayTimer); autoplayTimer = null; }
   }
-  function restartAutoplay() { startAutoplay(); }
+
+  function syncAutoplay(restart) {
+    const shouldRun = visible && !hovering && !document.hidden && !fx.drawerOpen;
+    if (restart) stopAutoplay();
+    if (shouldRun && !autoplayTimer) autoplayTimer = setInterval(next, AUTOPLAY_DELAY);
+    if (!shouldRun) stopAutoplay();
+  }
 
   cards.forEach((card, cardIndex) => {
     card.addEventListener('click', () => {
-      if (order[0] !== cardIndex) { bringToFront(cardIndex); restartAutoplay(); }
+      if (order[0] !== cardIndex) { bringToFront(cardIndex); syncAutoplay(true); }
     });
   });
 
-  if (prevBtn) prevBtn.addEventListener('click', () => { prev(); restartAutoplay(); });
-  if (nextBtn) nextBtn.addEventListener('click', () => { next(); restartAutoplay(); });
+  if (prevBtn) prevBtn.addEventListener('click', () => { prev(); syncAutoplay(true); });
+  if (nextBtn) nextBtn.addEventListener('click', () => { next(); syncAutoplay(true); });
 
   if (wrapper) {
-    wrapper.addEventListener('mouseenter', stopAutoplay);
-    wrapper.addEventListener('mouseleave', startAutoplay);
+    wrapper.addEventListener('mouseenter', () => { hovering = true;  syncAutoplay(); });
+    wrapper.addEventListener('mouseleave', () => { hovering = false; syncAutoplay(); });
+
+    new IntersectionObserver(entries => {
+      visible = entries[0].isIntersecting;
+      syncAutoplay();
+    }, { threshold: 0.1 }).observe(wrapper);
   }
 
+  document.addEventListener('visibilitychange', () => syncAutoplay());
+
   render();
-  startAutoplay();
 }
 
 /* ============================================================
-   PRELOADER — caps at 1.2s, never blocks hero h1
+   PRELOADER
    ============================================================ */
 function initPreloader() {
-  const loaderWrapper = document.getElementById('loader-wrapper');
-  if (!loaderWrapper) return;
+  const loader = document.getElementById('loader-wrapper');
+  if (!loader) return;
 
+  let done = false;
   function hideLoader() {
-    loaderWrapper.classList.add('hidden');
-    // Remove from DOM after fade completes
-    setTimeout(() => { loaderWrapper.remove(); }, 900);
+    if (done) return;
+    done = true;
+    loader.classList.add('hidden');
+    setTimeout(() => loader.remove(), 900);
   }
 
-  // Hide after max 1.2s, or immediately when page is already loaded
   if (document.readyState === 'complete') {
     setTimeout(hideLoader, 300);
   } else {
     window.addEventListener('load', () => setTimeout(hideLoader, 1200), { once: true });
-    // Safety fallback
     setTimeout(hideLoader, 3000);
   }
 }
 
 /* ============================================================
-   MASTER INIT — DOMContentLoaded (deferred script)
+   MASTER INIT
    ============================================================ */
 document.addEventListener('DOMContentLoaded', () => {
-  // Critical UI init first
   initPreloader();
   initCustomCursor();
   initThemeToggle();
@@ -725,31 +797,28 @@ document.addEventListener('DOMContentLoaded', () => {
   initProjectDrawer();
   initContactForm();
   initCertStack();
-  initParallax();
 
-  // Three.js — after window load + idle, skip on mobile
+  // Three.js: after load + idle; skipped on mobile, reduced motion, and data saver
   window.addEventListener('load', () => {
     const loadThree = () => {
-      if (window.innerWidth < 768 ||
-          window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      if (window.innerWidth < 768 || REDUCED ||
+          (navigator.connection && navigator.connection.saveData)) return;
 
       const s = document.createElement('script');
       s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-      s.defer = true;
+      s.async = true;
       s.onload = initThreeJS;
       document.head.appendChild(s);
     };
 
-    if ('requestIdleCallback' in window) {
-      requestIdleCallback(loadThree, { timeout: 2000 });
-    } else {
-      setTimeout(loadThree, 500);
-    }
+    if ('requestIdleCallback' in window) requestIdleCallback(loadThree, { timeout: 2500 });
+    else setTimeout(loadThree, 800);
   }, { once: true });
 });
 
-/* CSS for spinner animation (injected once) */
-const spinStyle = document.createElement('style');
-spinStyle.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
-document.head.appendChild(spinStyle);
-
+/* spinner keyframes */
+(function () {
+  const s = document.createElement('style');
+  s.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+  document.head.appendChild(s);
+})();
